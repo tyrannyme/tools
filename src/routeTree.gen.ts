@@ -10,43 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ImageResizeRouteImport } from './routes/image-resize'
+import { Route as CategoryIndexRouteImport } from './routes/$category/index'
+import { Route as CategoryToolRouteImport } from './routes/$category/$tool'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ImageResizeRoute = ImageResizeRouteImport.update({
-  id: '/image-resize',
-  path: '/image-resize',
+const CategoryIndexRoute = CategoryIndexRouteImport.update({
+  id: '/$category/',
+  path: '/$category/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoryToolRoute = CategoryToolRouteImport.update({
+  id: '/$category/$tool',
+  path: '/$category/$tool',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/image-resize': typeof ImageResizeRoute
+  '/$category/$tool': typeof CategoryToolRoute
+  '/$category/': typeof CategoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/image-resize': typeof ImageResizeRoute
+  '/$category/$tool': typeof CategoryToolRoute
+  '/$category': typeof CategoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/image-resize': typeof ImageResizeRoute
+  '/$category/$tool': typeof CategoryToolRoute
+  '/$category/': typeof CategoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/image-resize'
+  fullPaths: '/' | '/$category/$tool' | '/$category/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/image-resize'
-  id: '__root__' | '/' | '/image-resize'
+  to: '/' | '/$category/$tool' | '/$category'
+  id: '__root__' | '/' | '/$category/$tool' | '/$category/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ImageResizeRoute: typeof ImageResizeRoute
+  CategoryToolRoute: typeof CategoryToolRoute
+  CategoryIndexRoute: typeof CategoryIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,11 +68,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/image-resize': {
-      id: '/image-resize'
-      path: '/image-resize'
-      fullPath: '/image-resize'
-      preLoaderRoute: typeof ImageResizeRouteImport
+    '/$category/': {
+      id: '/$category/'
+      path: '/$category'
+      fullPath: '/$category/'
+      preLoaderRoute: typeof CategoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$category/$tool': {
+      id: '/$category/$tool'
+      path: '/$category/$tool'
+      fullPath: '/$category/$tool'
+      preLoaderRoute: typeof CategoryToolRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -70,7 +87,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ImageResizeRoute: ImageResizeRoute,
+  CategoryToolRoute: CategoryToolRoute,
+  CategoryIndexRoute: CategoryIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

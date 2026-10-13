@@ -6,4 +6,5 @@ dist/
 .env*
 .dev.vars*
 !.env.example
+!.env.schema
 worker-configuration.d.ts

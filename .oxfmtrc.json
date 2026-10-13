@@ -4,6 +4,7 @@
     "dist/**",
     "src/routeTree.gen.ts",
     "pnpm-lock.yaml",
-    "proposals/image-resize.html"
+    "proposals/image-resize.html",
+    "src/env.d.ts"
   ]
 }

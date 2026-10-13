@@ -1,66 +1,54 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, ImageIcon } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { startGildedDusk } from "@/components/gilded-dusk";
+import { DuskPanel } from "@/components/dusk-panel";
 import { OrnateFrame } from "@/components/ornament";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { ToolGrid } from "@/components/tool-card";
+import { categories, tools, toolsIn } from "@/lib/tools";
+import { seo } from "@/lib/seo";
 
-export const Route = createFileRoute("/")({ component: ToolsPage });
+export const Route = createFileRoute("/")({
+  head: () =>
+    seo({
+      title: "Tools by Tyranny",
+      description: `${tools.length} free tools for images, video, documents, games, and 3D. Everything runs in your browser.`,
+      path: "/",
+    }),
+  component: HomePage,
+});
 
-function ToolsPage() {
-  const area = useRef<HTMLDivElement>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    if (!area.current || !canvas.current) return;
-    return startGildedDusk(canvas.current, area.current);
-  }, []);
-
+function HomePage() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-14">
       <OrnateFrame>
-        <div
-          ref={area}
-          className="relative overflow-hidden rounded-xl bg-dusk px-8 py-14 text-white sm:py-20"
-        >
-          <canvas
-            ref={canvas}
-            aria-hidden="true"
-            className="absolute inset-0 size-full opacity-0 transition-opacity duration-700 data-ready:opacity-100"
-          />
-          <div className="pointer-events-none relative space-y-2">
-            <h1 className="text-3xl font-semibold tracking-tight">Tools</h1>
-            <p className="text-white/75">Useful things, right in your browser.</p>
-          </div>
-        </div>
+        <DuskPanel className="rounded-xl px-8 py-14 sm:py-20">
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Tools</h1>
+          <p className="mt-2 max-w-md text-white/75">
+            Free tools that run in your browser. Your files never leave your device.
+          </p>
+        </DuskPanel>
       </OrnateFrame>
-      <OrnateFrame className="max-w-md">
-        <Card>
-          <CardHeader>
-            <ImageIcon className="mb-2 size-5 text-muted-foreground" aria-hidden="true" />
-            <CardTitle>Image resize</CardTitle>
-            <CardDescription>
-              Make an image smaller for a profile picture or a file size limit.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            Planned to run entirely on your device.
-          </CardContent>
-          <CardFooter>
-            <Button variant="outline" nativeButton={false} render={<Link to="/image-resize" />}>
-              View tool <ArrowRight aria-hidden="true" />
-            </Button>
-          </CardFooter>
-        </Card>
-      </OrnateFrame>
+      {categories.map((category) => {
+        const list = toolsIn(category);
+        if (list.length === 0) return null;
+        const Icon = category.icon;
+        return (
+          <section key={category.slug} aria-labelledby={`category-${category.slug}`}>
+            <div className="mb-5">
+              <h2 id={`category-${category.slug}`} className="text-xl font-semibold tracking-tight">
+                <Link
+                  to="/$category"
+                  params={{ category: category.slug }}
+                  className="inline-flex items-center gap-2 hover:text-gold"
+                >
+                  <Icon className="size-5 text-gold" aria-hidden="true" />
+                  {category.name}
+                </Link>
+              </h2>
+              <p className="mt-1 text-muted-foreground">{category.description}</p>
+            </div>
+            <ToolGrid tools={list} />
+          </section>
+        );
+      })}
     </div>
   );
 }
