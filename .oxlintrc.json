@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "jsx-a11y"],
+  "categories": { "correctness": "error" },
+  "ignorePatterns": ["dist/**", "src/routeTree.gen.ts", "proposals/image-resize.html"],
+  "overrides": [
+    {
+      "files": ["src/components/ui/label.tsx"],
+      "rules": { "jsx-a11y/label-has-associated-control": "off" }
+    },
+    {
+      "files": ["src/components/ui/field.tsx"],
+      "rules": { "jsx-a11y/prefer-tag-over-role": "off" }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.tanstack/
+.wrangler/
+.output/
+.env*
+.dev.vars*
+!.env.example
+worker-configuration.d.ts

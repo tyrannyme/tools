@@ -1,0 +1,16 @@
+allowBuilds:
+  # The site only uses vgpu in the browser; skip the headless Node GPU backend.
+  "@vgpu/adapter-node": false
+  esbuild: true
+  webgpu: false
+  workerd: true
+minimumReleaseAgeExclude:
+  # The project explicitly uses the latest Vite; keep the global delay for other packages.
+  - vite@8.3.4
+  # The project explicitly uses the latest vgpu release.
+  - vgpu@0.6.0
+  - "@vgpu/core@0.6.0"
+  - "@vgpu/wgsl@0.6.0"
+  - "@vgpu/wgsl-std@0.6.0"
+  - "@vgpu/adapter-mock@0.6.0"
+  - "@vgpu/adapter-node@0.6.0"
