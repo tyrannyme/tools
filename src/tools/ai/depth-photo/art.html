@@ -1,0 +1,58 @@
+<div class="scene" data-glow="0.5 0.45">
+  <div class="stack">
+    <div class="layer far"><img src="asset:art/doorway-depth-far.webp" alt="" /></div>
+    <div class="layer mid"><img src="asset:art/doorway-depth-mid.webp" alt="" /></div>
+    <div class="layer near"><img src="asset:art/doorway-depth-near.webp" alt="" /></div>
+  </div>
+</div>
+<style>
+  .scene {
+    width: 1240px;
+    height: 760px;
+    perspective: 1900px;
+    display: grid;
+    place-items: center;
+  }
+  .stack {
+    position: relative;
+    width: 432px;
+    height: 518px;
+    transform-style: preserve-3d;
+    transform: translateX(180px) translateZ(60px) rotateX(4deg) rotateY(52deg);
+  }
+  .layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* The only ornate frame: the farthest layer, the sky. */
+  .far {
+    border-radius: 216px 216px 20px 20px;
+    transform: translateZ(-700px);
+    outline: 4px solid var(--gold);
+    outline-offset: 10px;
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 10px rgb(23 19 42 / 0.6),
+      0 0 60px 10px rgb(230 192 114 / 0.3),
+      0 40px 80px rgb(10 6 24 / 0.6);
+  }
+  /* Nearer layers are plain glass panes, each further out than the last. */
+  .mid,
+  .near {
+    border-radius: 18px;
+    background: linear-gradient(rgb(255 244 236 / 0.14), rgb(255 244 236 / 0.05));
+    box-shadow: inset 0 0 0 2px rgb(248 230 184 / 0.4);
+  }
+  .mid {
+    transform: translateZ(-240px);
+  }
+  .near {
+    transform: translateZ(180px);
+  }
+</style>

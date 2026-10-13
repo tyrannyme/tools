@@ -1,0 +1,124 @@
+<div class="stage" data-glow="0.6 0.45">
+  <svg class="rays" viewBox="0 0 1020 640">
+    <g class="line glow">
+      <path d="M51 256 L470 110 M51 384 L470 590" />
+    </g>
+  </svg>
+  <div class="small"><canvas id="small"></canvas></div>
+  <div class="big"><canvas id="big"></canvas></div>
+</div>
+<style>
+  .stage {
+    position: relative;
+    width: 1020px;
+    height: 640px;
+  }
+  .rays {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .rays .line {
+    stroke-width: 2.5;
+    opacity: 0.8;
+  }
+  .small,
+  .big {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    background:
+      repeating-conic-gradient(rgb(255 255 255 / 0.09) 0 25%, rgb(255 255 255 / 0.02) 0 50%) 0 0 /
+        var(--check) var(--check),
+      radial-gradient(
+        circle at 50% 58%,
+        rgb(128 100 178 / 0.75),
+        rgb(52 38 92 / 0.85) 45%,
+        rgb(23 19 42 / 0.9) 80%
+      );
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 12px rgb(23 19 42 / 0.6),
+      0 0 60px 10px rgb(230 192 114 / 0.3),
+      var(--shadow);
+    outline: 3px solid var(--gold);
+  }
+  .small {
+    --check: 16px;
+    left: 30px;
+    top: 235px;
+    width: 170px;
+    height: 170px;
+    border-radius: 14px;
+    outline-offset: 10px;
+  }
+  .big {
+    --check: 60px;
+    left: 430px;
+    top: 20px;
+    width: 560px;
+    height: 600px;
+    border-radius: 280px 280px 26px 26px;
+    outline-offset: 12px;
+    outline-width: 4px;
+    background-position:
+      40px 90px,
+      0 0;
+  }
+  .big canvas {
+    position: absolute;
+    left: 40px;
+    top: 90px;
+  }
+</style>
+<script type="module">
+  import { canvas, drawSprite } from "asset:art/pixels.js";
+
+  const potion = [
+    "................",
+    ".....kkkkkk.....",
+    ".....kcccCk.....",
+    ".....kcccCk.....",
+    ".....kkkkkk.....",
+    "......kwgk......",
+    ".....kkwgkk.....",
+    "....kkggggkk....",
+    "...kgwgggggGk...",
+    "..kgwLLpppppGk..",
+    "..kpLppppwppPk..",
+    "..kppppppppppk..",
+    "..kpppwpppPPPk..",
+    "...kPpppPPPPk...",
+    "....kkkkkkkk....",
+    "................",
+  ];
+  const palette = {
+    k: "#2a1838",
+    c: "#c08a4e",
+    C: "#8a5a30",
+    g: "#b9b4e6",
+    G: "#7f78b8",
+    w: "#fbf3ff",
+    L: "#ffa6cf",
+    p: "#e2508f",
+    P: "#a92f6c",
+  };
+
+  function draw() {
+    drawSprite(canvas(document.getElementById("small"), 128, 128), potion, palette, 0, 0, 8);
+    const big = canvas(document.getElementById("big"), 480, 480);
+    drawSprite(big, potion, palette, 0, 0, 30);
+    // Hairline seams between the enlarged pixels, only where there is paint.
+    big.fillStyle = "rgb(20 10 30 / 0.28)";
+    potion.forEach((row, y) =>
+      [...row].forEach((cell, x) => {
+        if (cell === ".") return;
+        big.fillRect(x * 30 + 28, y * 30, 2, 30);
+        big.fillRect(x * 30, y * 30 + 28, 30, 2);
+      }),
+    );
+  }
+  if (window.automedia) window.automedia.registerRenderer(async () => draw());
+  else draw();
+</script>

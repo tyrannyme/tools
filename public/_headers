@@ -1,0 +1,5 @@
+# Cross-origin isolation lets on-device AI use multiple CPU threads (SharedArrayBuffer).
+# "credentialless" still allows the cross-origin model and runtime downloads.
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless

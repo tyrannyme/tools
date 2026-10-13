@@ -1,0 +1,207 @@
+<div class="stage" data-glow="0.5 0.45">
+  <svg class="halo line glow" viewBox="0 0 700 700">
+    <circle cx="350" cy="350" r="300" />
+    <circle class="fine" cx="350" cy="350" r="284" />
+    <path
+      class="lozenges"
+      d="M350 34 l16 16 -16 16 -16 -16 Z M350 634 l16 16 -16 16 -16 -16 Z M34 350 l16 -16 16 16 -16 16 Z M634 350 l16 -16 16 16 -16 16 Z"
+    />
+  </svg>
+  <canvas id="die"></canvas>
+</div>
+<style>
+  .stage {
+    position: relative;
+    width: 700px;
+    height: 700px;
+  }
+  .halo {
+    position: absolute;
+    inset: 0;
+  }
+  .halo .fine {
+    stroke-width: 2;
+    opacity: 0.7;
+  }
+  .halo .lozenges {
+    fill: var(--ink);
+    stroke-width: 3;
+  }
+  #die {
+    position: absolute;
+    inset: 0;
+    width: 700px;
+    height: 700px;
+    filter: drop-shadow(0 40px 50px rgb(10 6 24 / 0.6));
+  }
+</style>
+<script type="module">
+  import * as THREE from "three";
+  import { drawText, textWidth } from "asset:art/pixels.js";
+
+  const SIZE = 700;
+  const CELL = 256;
+
+  // Each face gets a cell in a 5x4 atlas: ink with a double gold border and a pixel numeral.
+  function atlas(numbers, glow) {
+    const element = document.createElement("canvas");
+    element.width = CELL * 5;
+    element.height = CELL * 4;
+    const ctx = element.getContext("2d");
+    ctx.fillStyle = glow ? "#000" : "#1d1734";
+    ctx.fillRect(0, 0, element.width, element.height);
+    numbers.forEach((number, index) => {
+      const ox = (index % 5) * CELL;
+      const oy = Math.floor(index / 5) * CELL;
+      const tri = (inset) => {
+        const h = CELL - 16;
+        const cx = ox + CELL / 2;
+        const cy = oy + 8 + (h * 2) / 3;
+        const p = [
+          [ox + CELL / 2, oy + 8],
+          [ox + 8, oy + CELL - 8],
+          [ox + CELL - 8, oy + CELL - 8],
+        ].map(([x, y]) => [cx + (x - cx) * inset, cy + (y - cy) * inset]);
+        ctx.beginPath();
+        ctx.moveTo(...p[0]);
+        ctx.lineTo(...p[1]);
+        ctx.lineTo(...p[2]);
+        ctx.closePath();
+      };
+      if (!glow) {
+        const shade = ctx.createLinearGradient(ox, oy, ox, oy + CELL);
+        shade.addColorStop(0, "#2c2350");
+        shade.addColorStop(1, "#171230");
+        ctx.fillStyle = shade;
+        tri(1.02);
+        ctx.fill();
+      }
+      ctx.strokeStyle = glow ? "#8a6a2e" : "#e6c072";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 7;
+      tri(0.99);
+      ctx.stroke();
+      ctx.lineWidth = 3;
+      tri(0.86);
+      ctx.stroke();
+      const text = String(number);
+      const size = 10;
+      const width = textWidth(text) * size;
+      const x = Math.round(ox + (CELL - width) / 2);
+      const y = Math.round(oy + CELL * 0.69 - (7 * size) / 2);
+      drawText(ctx, text, x, y, size, glow ? (number === 20 ? "#fff0c8" : "#b08a40") : "#f8e6b8", {
+        shadow: glow ? undefined : "#3a2c18",
+      });
+    });
+    const texture = new THREE.CanvasTexture(element);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.magFilter = THREE.NearestFilter;
+    texture.anisotropy = 8;
+    return texture;
+  }
+
+  async function render() {
+    const element = document.getElementById("die");
+    const renderer = new THREE.WebGLRenderer({
+      canvas: element,
+      alpha: true,
+      antialias: true,
+      preserveDrawingBuffer: true,
+    });
+    renderer.setPixelRatio(1);
+    renderer.setSize(SIZE, SIZE, false);
+    renderer.toneMapping = THREE.NoToneMapping;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+    camera.position.set(0, 0, 5.3);
+
+    const geometry = new THREE.IcosahedronGeometry(1, 0);
+    const position = geometry.attributes.position;
+    const faces = [];
+    for (let f = 0; f < 20; f++) {
+      const v = [0, 1, 2].map((i) => new THREE.Vector3().fromBufferAttribute(position, f * 3 + i));
+      const normal = new THREE.Vector3()
+        .crossVectors(v[1].clone().sub(v[0]), v[2].clone().sub(v[0]))
+        .normalize();
+      faces.push({ v, normal });
+    }
+    // Numbers: the front face shows 20, and opposite faces add up to 21.
+    const numbers = Array(20).fill(0);
+    numbers[0] = 20;
+    const opposite = (f) => faces.findIndex((g) => g.normal.dot(faces[f].normal) < -0.99);
+    numbers[opposite(0)] = 1;
+    let next = 2;
+    const order = [...faces.keys()].sort(
+      (a, b) => faces[b].normal.dot(faces[0].normal) - faces[a].normal.dot(faces[0].normal),
+    );
+    const sequence = [8, 14, 2, 12, 6, 18, 4, 16, 10];
+    for (const f of order) {
+      if (numbers[f]) continue;
+      const n = sequence.shift() ?? next++;
+      numbers[f] = n;
+      numbers[opposite(f)] = 21 - n;
+    }
+
+    // UVs: vertex 0 at the apex of each atlas triangle.
+    const uv = [];
+    for (let f = 0; f < 20; f++) {
+      const ox = (f % 5) / 5;
+      const oy = Math.floor(f / 5) / 4;
+      const pad = 8 / (CELL * 5);
+      const padY = 8 / (CELL * 4);
+      const cw = 1 / 5;
+      const ch = 1 / 4;
+      uv.push(
+        ox + cw / 2,
+        1 - (oy + padY),
+        ox + pad,
+        1 - (oy + ch - padY),
+        ox + cw - pad,
+        1 - (oy + ch - padY),
+      );
+    }
+    geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+    geometry.computeVertexNormals();
+
+    const material = new THREE.MeshStandardMaterial({
+      map: atlas(numbers, false),
+      emissiveMap: atlas(numbers, true),
+      emissive: new THREE.Color(1, 1, 1),
+      emissiveIntensity: 0.55,
+      metalness: 0.35,
+      roughness: 0.42,
+      flatShading: true,
+    });
+    const die = new THREE.Mesh(geometry, material);
+
+    // Turn the 20 to face the viewer, upright, then tilt a little for depth.
+    const face = faces[0];
+    const q = new THREE.Quaternion().setFromUnitVectors(face.normal, new THREE.Vector3(0, 0, 1));
+    const centroid = face.v[0].clone().add(face.v[1]).add(face.v[2]).divideScalar(3);
+    const apex = face.v[0].clone().sub(centroid).applyQuaternion(q);
+    const spin = new THREE.Quaternion().setFromAxisAngle(
+      new THREE.Vector3(0, 0, 1),
+      Math.PI / 2 - Math.atan2(apex.y, apex.x),
+    );
+    const tilt = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.1, 0.14, 0));
+    die.quaternion.copy(tilt.multiply(spin.multiply(q)));
+    scene.add(die);
+
+    scene.add(new THREE.HemisphereLight(0xc9b6ff, 0x2a1830, 1.1));
+    const key = new THREE.DirectionalLight(0xffe2b0, 2.6);
+    key.position.set(-3, 4, 5);
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(0xff9ec4, 1.6);
+    rim.position.set(4, -2, -3);
+    scene.add(rim);
+    const fill = new THREE.DirectionalLight(0x9d8cff, 0.8);
+    fill.position.set(3, 1, 4);
+    scene.add(fill);
+
+    renderer.render(scene, camera);
+  }
+  let rendered;
+  const once = () => (rendered ??= render());
+  if (window.automedia) window.automedia.registerRenderer(once);
+  else once();
+</script>

@@ -1,0 +1,122 @@
+<div class="stage" data-glow="0.62 0.5">
+  <div class="page">
+    <p><span class="initial">O</span>nce upon a time, the lamps were lit at <mark>dusk</mark>.</p>
+    <div class="rule"></div>
+  </div>
+  <svg class="voice glow" viewBox="0 -300 340 600"></svg>
+</div>
+<style>
+  .stage {
+    position: relative;
+    width: 860px;
+    height: 600px;
+  }
+  .page {
+    isolation: isolate;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 500px;
+    height: 600px;
+    padding: 160px 36px 0 50px;
+    border-radius: 250px 250px 26px 26px;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 35%, rgb(230 192 114 / 0.16), transparent 70%),
+      linear-gradient(170deg, #2c2350, #17132a 85%);
+    color: var(--gold-light);
+    outline: 4px solid var(--gold);
+    outline-offset: 12px;
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 12px rgb(23 19 42 / 0.6),
+      0 0 60px 10px rgb(230 192 114 / 0.35),
+      0 40px 80px rgb(10 6 24 / 0.6);
+  }
+  p {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 66px;
+    line-height: 1.08;
+    text-shadow: 0 0 16px rgb(230 192 114 / 0.45);
+  }
+  .initial {
+    float: left;
+    width: 136px;
+    height: 136px;
+    margin: 6px 16px 0 0;
+    display: grid;
+    place-items: center;
+    padding-top: 8px;
+    border-radius: 8px;
+    font-size: 136px;
+    line-height: 1;
+    color: var(--ink);
+    text-shadow: none;
+    background:
+      radial-gradient(circle at 35% 30%, #fff1c9, transparent 60%),
+      linear-gradient(145deg, var(--gold-light), var(--gold) 45%, var(--gold-deep));
+    box-shadow:
+      inset 0 0 0 3px var(--gold-deep),
+      inset 0 0 0 8px rgb(255 248 228 / 0.5),
+      inset 0 0 0 10px var(--gold-deep),
+      0 0 28px rgb(230 192 114 / 0.6);
+  }
+  mark {
+    position: relative;
+    z-index: -1;
+    padding: 0 6px;
+    margin: 0 -6px;
+    border-radius: 8px;
+    color: var(--ink);
+    text-shadow: none;
+    background: linear-gradient(180deg, var(--gold-light), var(--gold));
+    box-shadow: 0 0 26px rgb(230 192 114 / 0.9);
+  }
+  .rule {
+    position: absolute;
+    left: 50%;
+    bottom: 40px;
+    width: 18px;
+    height: 18px;
+    margin-left: -9px;
+    transform: rotate(45deg);
+    background: var(--gold);
+    box-shadow:
+      40px -40px 0 -4px var(--gold),
+      -40px 40px 0 -4px var(--gold);
+  }
+  .voice {
+    position: absolute;
+    left: 520px;
+    top: 0;
+    width: 340px;
+    height: 600px;
+    overflow: visible;
+  }
+  .voice path {
+    fill: none;
+    stroke-linecap: round;
+  }
+  .voice rect {
+    fill: var(--gold);
+  }
+</style>
+<script type="module">
+  // Sound rings spreading from the page.
+  let svg = "";
+  for (const [i, r] of [80, 160, 240, 320].entries()) {
+    const a = ((48 - i * 2) * Math.PI) / 180;
+    const x = r * Math.cos(a) - 20;
+    const y = r * Math.sin(a);
+    const fade = 1 - i * 0.15;
+    const d = `M ${x} ${-y} A ${r} ${r} 0 0 1 ${x} ${y}`;
+    svg += `<g opacity="${fade}"><path d="${d}" stroke="#e6c072" stroke-width="${16 - i * 2}" />`;
+    svg += `<path d="${d}" stroke="#fff4d6" stroke-width="${5 - i * 0.6}" /></g>`;
+    for (const end of [-y, y]) {
+      svg += `<rect x="${x - 8}" y="${end - 8}" width="16" height="16" transform="rotate(45 ${x} ${end})" opacity="${fade}" />`;
+    }
+  }
+  document.querySelector(".voice").innerHTML = svg;
+  window.automedia?.registerRenderer(() => document.fonts.ready.catch(() => {}));
+</script>

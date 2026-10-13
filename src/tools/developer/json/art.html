@@ -1,0 +1,111 @@
+<div class="stage" data-glow="0.5 0.48">
+  <svg viewBox="0 0 1000 600" width="1000" height="600">
+    <defs>
+      <radialGradient id="node" cx="40%" cy="35%" r="70%">
+        <stop offset="0" stop-color="#3a2f63" />
+        <stop offset="1" stop-color="#151025" />
+      </radialGradient>
+      <!-- One brace, drawn once and mirrored: a scroll with curled ends and a pointed beak. -->
+      <path
+        id="brace"
+        d="M168 52 C190 52 196 76 182 86 C170 95 152 86 158 72 M168 52 C118 52 104 82 104 132 L104 238 C104 276 86 296 46 300 C86 304 104 324 104 362 L104 468 C104 518 118 548 168 548 C190 548 196 524 182 514 C170 505 152 514 158 528"
+      />
+    </defs>
+
+    <g class="braces">
+      <use href="#brace" x="56" />
+      <use href="#brace" transform="translate(944 0) scale(-1 1)" />
+    </g>
+    <g class="beaks">
+      <path d="M90 300 m0 -20 l14 20 l-14 20 l-14 -20 Z" />
+      <path d="M910 300 m0 -20 l14 20 l-14 20 l-14 -20 Z" />
+    </g>
+
+    <!-- The parsed tree: a root with three keys, two of them opened. -->
+    <g transform="translate(0 46)">
+      <g class="branches">
+        <path d="M500 128 C500 190 340 170 340 250" />
+        <path d="M500 128 V250" />
+        <path d="M500 128 C500 190 660 170 660 250" />
+        <path d="M340 286 C340 350 270 330 270 410" />
+        <path d="M340 286 C340 350 410 330 410 410" />
+        <path d="M660 286 C660 350 590 330 590 410" />
+        <path d="M660 286 C660 350 730 330 730 410" />
+      </g>
+      <g class="nodes">
+        <circle cx="500" cy="96" r="40" />
+        <circle cx="340" cy="268" r="25" />
+        <circle cx="660" cy="268" r="25" />
+      </g>
+      <g class="gems">
+        <path d="M500 96 m0 -24 l17 24 l-17 24 l-17 -24 Z" />
+        <path d="M340 268 m0 -13 l9 13 l-9 13 l-9 -13 Z" />
+        <path d="M660 268 m0 -13 l9 13 l-9 13 l-9 -13 Z" />
+        <path d="M500 270 m0 -27 l18 27 l-18 27 l-18 -27 Z" />
+        <path d="M270 428 m0 -24 l16 24 l-16 24 l-16 -24 Z" />
+        <path d="M410 428 m0 -24 l16 24 l-16 24 l-16 -24 Z" />
+        <path d="M590 428 m0 -24 l16 24 l-16 24 l-16 -24 Z" />
+        <path d="M730 428 m0 -24 l16 24 l-16 24 l-16 -24 Z" />
+      </g>
+    </g>
+  </svg>
+</div>
+<style>
+  .stage {
+    position: relative;
+    filter: drop-shadow(0 40px 50px rgb(10 6 24 / 0.6));
+  }
+  svg {
+    display: block;
+    overflow: visible;
+  }
+  /* Inlaid gold: a broad gold band with an ink core and a bright hairline down the middle. */
+  .braces use {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .braces {
+    filter: drop-shadow(0 0 18px rgb(230 192 114 / 0.5));
+  }
+  .braces use {
+    stroke: var(--gold);
+    stroke-width: 30;
+  }
+  .branches path {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 7;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px rgb(230 192 114 / 0.6));
+  }
+  .nodes circle {
+    fill: url(#node);
+    stroke: var(--gold);
+    stroke-width: 5;
+    filter: drop-shadow(0 0 10px rgb(230 192 114 / 0.5));
+  }
+  .gems path,
+  .beaks path {
+    fill: var(--gold-light);
+    stroke: var(--gold-deep);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 10px rgb(248 230 184 / 0.8));
+  }
+</style>
+<script type="module">
+  // Layer each brace into an inlay: gold band, ink core, bright centre line.
+  const group = document.querySelector(".braces");
+  const originals = [...group.children];
+  for (const [color, width] of [
+    ["#17132a", 18],
+    ["#f8e6b8", 3.5],
+  ]) {
+    for (const use of originals) {
+      const copy = use.cloneNode();
+      copy.style.stroke = color;
+      copy.style.strokeWidth = width;
+      group.append(copy);
+    }
+  }
+</script>

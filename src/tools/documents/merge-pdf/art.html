@@ -1,0 +1,174 @@
+<div class="stage" data-glow="0.5 0.42">
+  <svg class="arrows line glow" viewBox="0 0 1000 640">
+    <path d="M40 270 L80 320 L40 370 M84 270 L124 320 L84 370" />
+    <path d="M960 270 L920 320 L960 370 M916 270 L876 320 L916 370" />
+  </svg>
+  <div class="doc a">
+    <div class="page dark"></div>
+    <div class="page dark"></div>
+    <div class="page dark">
+      <img src="asset:samples/door.webp" alt="" />
+      <div class="text"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+  </div>
+  <div class="doc b">
+    <div class="page light"></div>
+    <div class="page light">
+      <img src="asset:samples/door.webp" alt="" />
+      <div class="text"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+  </div>
+  <div class="ribbon"></div>
+  <div class="seal">
+    <svg viewBox="0 0 100 100"><path d="M50 18 L70 50 L50 82 L30 50 Z" /></svg>
+  </div>
+</div>
+<style>
+  .stage {
+    position: relative;
+    width: 1000px;
+    height: 640px;
+    transform: translateY(-14px) scale(1.17);
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6));
+  }
+  .arrows {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .doc {
+    position: absolute;
+    top: 130px;
+    width: 280px;
+    height: 396px;
+    transform-origin: 50% 100%;
+  }
+  .doc.a {
+    left: 228px;
+    transform: rotate(5deg);
+  }
+  .doc.b {
+    left: 492px;
+    transform: rotate(-5deg);
+  }
+  .page {
+    --fold: 44px;
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    clip-path: polygon(0 0, calc(100% - var(--fold)) 0, 100% var(--fold), 100% 100%, 0 100%);
+  }
+  .page::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--fold);
+    height: var(--fold);
+    border-bottom-left-radius: 6px;
+    background: linear-gradient(
+      225deg,
+      transparent 50%,
+      var(--gold-deep) 50%,
+      var(--gold) 80%,
+      var(--gold-light)
+    );
+  }
+  .a .page:nth-child(1) {
+    transform: translate(-30px, -26px);
+    filter: brightness(0.7);
+  }
+  .a .page:nth-child(2) {
+    transform: translate(-15px, -13px);
+    filter: brightness(0.85);
+  }
+  .b .page:nth-child(1) {
+    transform: translate(15px, -13px);
+    filter: brightness(0.85);
+  }
+  .dark {
+    background: linear-gradient(170deg, #2e2850, #1a1630);
+    box-shadow: inset 0 0 0 2px rgb(230 192 114 / 0.5);
+  }
+  .light {
+    background: linear-gradient(170deg, #f8f1f5, #e2d6e4);
+    box-shadow: inset 0 0 0 2px rgb(169 124 52 / 0.5);
+  }
+  .page img {
+    position: absolute;
+    left: 50%;
+    top: 28px;
+    width: 160px;
+    margin-left: -80px;
+  }
+  .text {
+    position: absolute;
+    left: 34px;
+    right: 34px;
+    top: 270px;
+    display: grid;
+    gap: 10px;
+  }
+  .text i {
+    height: 7px;
+    border-radius: 4px;
+    background: rgb(230 192 114 / 0.5);
+  }
+  .light .text i {
+    background: rgb(23 19 42 / 0.28);
+  }
+  .text i:nth-child(1) {
+    width: 92%;
+  }
+  .text i:nth-child(3) {
+    width: 96%;
+  }
+  .text i:nth-child(4) {
+    width: 88%;
+  }
+  .text i:nth-child(6) {
+    width: 58%;
+  }
+  .ribbon {
+    position: absolute;
+    left: 176px;
+    right: 176px;
+    top: 330px;
+    height: 58px;
+    background: linear-gradient(180deg, var(--gold-light), var(--gold) 45%, var(--gold-deep));
+    box-shadow:
+      inset 0 6px 0 -3px rgb(255 248 228 / 0.9),
+      inset 0 -6px 0 -3px rgb(120 84 30 / 0.7),
+      inset 0 12px 0 -10px rgb(120 84 30 / 0.55),
+      inset 0 -12px 0 -10px rgb(255 248 228 / 0.6);
+    filter: drop-shadow(0 0 20px rgb(230 192 114 / 0.5)) drop-shadow(0 12px 16px rgb(10 6 24 / 0.5));
+    clip-path: polygon(0 0, 100% 0, calc(100% - 24px) 50%, 100% 100%, 0 100%, 24px 50%);
+  }
+  .seal {
+    position: absolute;
+    left: 50%;
+    top: 359px;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle at 35% 30%, #fff3d0, var(--gold) 55%, var(--gold-deep));
+    box-shadow:
+      inset 0 0 0 6px var(--gold-deep),
+      inset 0 0 0 10px var(--gold-light),
+      inset 0 0 0 12px var(--gold-deep),
+      0 0 60px rgb(230 192 114 / 0.8),
+      0 14px 30px rgb(10 6 24 / 0.6);
+  }
+  .seal svg {
+    width: 80px;
+    height: 80px;
+    fill: var(--ink);
+    stroke: var(--gold-light);
+    stroke-width: 3;
+    stroke-linejoin: round;
+  }
+</style>

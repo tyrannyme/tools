@@ -5,22 +5,22 @@
 /* eslint-disable */
 export type CoercedEnvSchema = {
   /**
-   * **TYPESAFE_API_KEY** 🔐 _sensitive_  
-   * TypeSafe API key for Jev, which ranks tools by what you describe in search.  
+   * **OPENROUTER_API_KEY** 🔐 _sensitive_  
+   * OpenRouter API key. Search uses it to ask Jev which tools fit what a visitor describes.  
    * Without it, search matches tool names and keywords only.  
-   * Store it encrypted with `pnpm exec varlock encrypt` and put the result in .env.local.  
+   * Set it in .env.local as varlock(prompt), then run `pnpm exec varlock load` to enter it encrypted.  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M29%2022h-5a2.003%202.003%200%200%201-2-2v-6a2%202%200%200%201%202-2h5v2h-5v6h5ZM18%2012h-4V8h-2v14h6a2.003%202.003%200%200%200%202-2v-6a2%202%200%200%200-2-2m-4%208v-6h4v6Zm-6-8H3v2h5v2H4a2%202%200%200%200-2%202v2a2%202%200%200%200%202%202h6v-8a2%202%200%200%200-2-2m0%208H4v-2h4Z%22%2F%3E%3C%2Fsvg%3E)   
    *   
-   * 📚 {@link https://console.typesafe.ai/keys}  
+   * 📚 {@link https://openrouter.ai/settings/keys}  
    */
-  TYPESAFE_API_KEY?: string;
+  OPENROUTER_API_KEY?: string;
   
 };
 
-type _CoercedEnvSchema_d6aa8a7f = CoercedEnvSchema;
+type _CoercedEnvSchema_493b0398 = CoercedEnvSchema;
 
 declare module 'varlock/env' {
-  export interface TypedEnvSchema extends Readonly<_CoercedEnvSchema_d6aa8a7f> {}
+  export interface TypedEnvSchema extends Readonly<_CoercedEnvSchema_493b0398> {}
   export interface PublicTypedEnvSchema extends Readonly<Record<string, never>> {}
 }
 
@@ -31,17 +31,17 @@ export type EnvSchemaAsStrings = {
       : (NonNullable<CoercedEnvSchema[Property]> extends boolean ? ('true' | 'false') : string)
 };
 
-type _EnvSchemaAsStrings_d6aa8a7f = EnvSchemaAsStrings;
+type _EnvSchemaAsStrings_493b0398 = EnvSchemaAsStrings;
 declare global {
 
   // add types for global import.meta.env
-  interface ImportMetaEnv extends _EnvSchemaAsStrings_d6aa8a7f {}
+  interface ImportMetaEnv extends _EnvSchemaAsStrings_493b0398 {}
   interface ImportMeta {
     readonly env: ImportMetaEnv;
   }
 
   // add types for global process.env
   namespace NodeJS {
-    interface ProcessEnv extends _EnvSchemaAsStrings_d6aa8a7f {}
+    interface ProcessEnv extends _EnvSchemaAsStrings_493b0398 {}
   }
 }

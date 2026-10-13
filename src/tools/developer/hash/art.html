@@ -1,0 +1,174 @@
+<div class="stage" data-glow="0.5 0.45">
+  <svg class="seal" viewBox="40 60 620 700" width="560" height="632">
+    <defs>
+      <radialGradient id="wax" cx="38%" cy="32%" r="75%">
+        <stop offset="0" stop-color="#fbeec8" />
+        <stop offset="0.35" stop-color="#e6c072" />
+        <stop offset="0.75" stop-color="#a97c34" />
+        <stop offset="1" stop-color="#6a4818" />
+      </radialGradient>
+      <radialGradient id="well" cx="42%" cy="36%" r="70%">
+        <stop offset="0" stop-color="#e9c77e" />
+        <stop offset="0.6" stop-color="#b98a3e" />
+        <stop offset="1" stop-color="#8a6226" />
+      </radialGradient>
+      <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2c2350" />
+        <stop offset="1" stop-color="#161126" />
+      </linearGradient>
+      <!-- A domed, poured surface. -->
+      <filter id="dome" x="-10%" y="-10%" width="120%" height="120%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="14" result="blur" />
+        <feSpecularLighting
+          in="blur"
+          surfaceScale="9"
+          specularConstant="0.9"
+          specularExponent="18"
+          lighting-color="#fff4d6"
+          result="spec"
+        >
+          <fePointLight x="120" y="-60" z="420" />
+        </feSpecularLighting>
+        <feComposite in="spec" in2="SourceAlpha" operator="in" result="lit" />
+        <feComposite
+          in="SourceGraphic"
+          in2="lit"
+          operator="arithmetic"
+          k1="0"
+          k2="1"
+          k3="0.55"
+          k4="0"
+        />
+      </filter>
+      <!-- Raised, struck metal for the impression. -->
+      <filter id="emboss" x="-10%" y="-10%" width="120%" height="120%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.6" result="blur" />
+        <feSpecularLighting
+          in="blur"
+          surfaceScale="3"
+          specularConstant="1.1"
+          specularExponent="24"
+          lighting-color="#fff6dc"
+          result="spec"
+        >
+          <fePointLight x="100" y="-100" z="300" />
+        </feSpecularLighting>
+        <feComposite in="spec" in2="SourceAlpha" operator="in" result="lit" />
+        <feOffset in="SourceAlpha" dx="3" dy="4" result="drop" />
+        <feGaussianBlur in="drop" stdDeviation="2.5" result="dropBlur" />
+        <feFlood flood-color="#3a2508" flood-opacity="0.75" />
+        <feComposite in2="dropBlur" operator="in" result="shadow" />
+        <feComposite
+          in="SourceGraphic"
+          in2="lit"
+          operator="arithmetic"
+          k1="0"
+          k2="1"
+          k3="0.7"
+          k4="0"
+          result="metal"
+        />
+        <feMerge>
+          <feMergeNode in="shadow" />
+          <feMergeNode in="metal" />
+        </feMerge>
+      </filter>
+      <!-- A pressed-in well. -->
+      <filter id="press" x="-10%" y="-10%" width="120%" height="120%">
+        <feOffset in="SourceAlpha" dx="-5" dy="-7" result="off" />
+        <feGaussianBlur in="off" stdDeviation="6" result="offBlur" />
+        <feComposite in="SourceAlpha" in2="offBlur" operator="out" result="inner" />
+        <feFlood flood-color="#3a2508" flood-opacity="0.8" />
+        <feComposite in2="inner" operator="in" result="shade" />
+        <feMerge>
+          <feMergeNode in="SourceGraphic" />
+          <feMergeNode in="shade" />
+        </feMerge>
+      </filter>
+      <path id="legend" d="M350 528 a178 178 0 1 1 0 -356 a178 178 0 1 1 0 356" />
+    </defs>
+
+    <!-- Ribbon tails behind the seal. -->
+    <g class="ribbons">
+      <path d="M300 420 L176 712 L224 690 L246 742 L372 448 Z" />
+      <path d="M400 420 L524 712 L476 690 L454 742 L328 448 Z" />
+      <path class="inner" d="M312 452 L206 700 M360 466 L254 714" />
+      <path class="inner" d="M388 452 L494 700 M340 466 L446 714" />
+    </g>
+
+    <path class="blob" fill="url(#wax)" filter="url(#dome)" />
+    <circle cx="350" cy="350" r="214" fill="url(#well)" filter="url(#press)" />
+
+    <g filter="url(#emboss)" fill="#e6c072">
+      <g class="beads"></g>
+      <circle cx="350" cy="350" r="200" fill="none" stroke="#e6c072" stroke-width="5" />
+      <circle cx="350" cy="350" r="150" fill="none" stroke="#e6c072" stroke-width="5" />
+      <text class="legend">
+        <textPath href="#legend" textLength="1060" startOffset="29">
+          E3B0C442 98FC1C14 9AFBF4C8 996FB924 27AE41E4 649B934C A495991B 7852B855
+        </textPath>
+      </text>
+      <!-- The struck mark: a hash. -->
+      <g class="mark" stroke="#e6c072" stroke-width="26" stroke-linecap="round" fill="none">
+        <path d="M322 258 L298 442" />
+        <path d="M402 258 L378 442" />
+        <path d="M262 316 L446 316" />
+        <path d="M254 384 L438 384" />
+      </g>
+      <g class="lozenge">
+        <path d="M350 512 l8 13 l-8 13 l-8 -13 Z" />
+      </g>
+    </g>
+  </svg>
+</div>
+<style>
+  .stage {
+    position: relative;
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6)) drop-shadow(0 0 50px rgb(230 192 114 / 0.3));
+  }
+  .seal {
+    display: block;
+    margin-top: 30px;
+  }
+  .ribbons path {
+    fill: url(#ribbon);
+    stroke: var(--gold);
+    stroke-width: 4;
+    stroke-linejoin: round;
+  }
+  .ribbons .inner {
+    fill: none;
+    stroke-width: 2;
+    opacity: 0.7;
+  }
+  .legend {
+    font-family: var(--serif);
+    font-size: 25px;
+    font-weight: 600;
+    fill: #e6c072;
+  }
+</style>
+<script type="module">
+  // The poured wax: a circle with soft bulges where it spread under the stamp.
+  const cx = 350;
+  const cy = 350;
+  const points = [];
+  for (let i = 0; i < 180; i++) {
+    const t = (i / 180) * Math.PI * 2;
+    const r =
+      258 + 9 * Math.sin(t * 5 + 0.7) + 6 * Math.sin(t * 9 + 2.1) + 4 * Math.sin(t * 14 + 4.3);
+    points.push(`${(cx + r * Math.cos(t)).toFixed(1)} ${(cy + r * Math.sin(t)).toFixed(1)}`);
+  }
+  document.querySelector(".blob").setAttribute("d", `M${points.join(" L")} Z`);
+
+  // A ring of beads just inside the rim.
+  const beads = document.querySelector(".beads");
+  for (let i = 0; i < 48; i++) {
+    const t = (i / 48) * Math.PI * 2;
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("cx", cx + 228 * Math.cos(t));
+    dot.setAttribute("cy", cy + 228 * Math.sin(t));
+    dot.setAttribute("r", 5);
+    beads.append(dot);
+  }
+</script>

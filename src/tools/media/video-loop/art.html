@@ -1,0 +1,168 @@
+<div class="scene" data-glow="0.5 0.5">
+  <canvas width="1280" height="800"></canvas>
+</div>
+<style>
+  .scene,
+  .scene canvas {
+    width: 1280px;
+    height: 800px;
+  }
+  .scene canvas {
+    filter: drop-shadow(0 40px 50px rgb(10 6 24 / 0.55));
+  }
+</style>
+<script type="module">
+  import * as THREE from "three";
+
+  // A band of film closed into a ring, circled by a gold orbit. The shots pan across the painting
+  // and back, so the last frame flows into the first: a seamless loop.
+  const frames = 11;
+  const radius = 330;
+  const band = 220;
+  const gold = "#e6c072";
+  const goldLight = "#f8e6b8";
+
+  const image = new Image();
+  image.src = "asset:samples/doorway.webp";
+
+  function filmTexture() {
+    const cell = 256;
+    const height = Math.round((cell * frames * band) / (2 * Math.PI * radius));
+    const canvas = document.createElement("canvas");
+    canvas.width = cell * frames;
+    canvas.height = height;
+    const g = canvas.getContext("2d");
+    g.fillStyle = "#0f0c1d";
+    g.fillRect(0, 0, canvas.width, height);
+    const rail = 40;
+    g.fillStyle = gold;
+    g.fillRect(0, 0, canvas.width, 5);
+    g.fillRect(0, height - 5, canvas.width, 5);
+    g.globalAlpha = 0.55;
+    g.fillRect(0, 11, canvas.width, 2);
+    g.fillRect(0, height - 13, canvas.width, 2);
+    g.globalAlpha = 1;
+    g.strokeStyle = gold;
+    g.lineWidth = 3;
+    for (let x = 10; x < canvas.width; x += cell / 6) {
+      for (const y of [rail / 2 + 3, height - rail / 2 - 3]) {
+        g.beginPath();
+        g.roundRect(x, y - 9, 22, 18, 5);
+        g.stroke();
+      }
+    }
+    for (let i = 0; i < frames; i++) {
+      const x = i * cell + 12;
+      const y = rail + 6;
+      const w = cell - 24;
+      const h = height - 2 * (rail + 6);
+      const pan = 0.5 + 0.5 * Math.sin((2 * Math.PI * i) / frames);
+      const sh = image.height * 0.8;
+      const sw = (sh * w) / h;
+      g.save();
+      g.beginPath();
+      g.roundRect(x, y, w, h, 10);
+      g.clip();
+      g.drawImage(image, (image.width - sw) * pan, image.height * 0.1, sw, sh, x, y, w, h);
+      g.restore();
+      g.strokeStyle = "rgb(230 192 114 / 0.65)";
+      g.lineWidth = 3;
+      g.beginPath();
+      g.roundRect(x, y, w, h, 10);
+      g.stroke();
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 8;
+    return texture;
+  }
+
+  function arrowhead(size) {
+    const shape = new THREE.Shape();
+    shape.moveTo(size, 0);
+    shape.lineTo(-size * 0.7, size * 0.75);
+    shape.lineTo(-size * 0.25, 0);
+    shape.lineTo(-size * 0.7, -size * 0.75);
+    shape.closePath();
+    return new THREE.ShapeGeometry(shape);
+  }
+
+  async function draw() {
+    await image.decode();
+    const canvas = document.querySelector(".scene canvas");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(1);
+    renderer.setSize(1280, 800, false);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(30, 1280 / 800, 10, 6000);
+    const tilt = (21 * Math.PI) / 180;
+    const distance = 1450;
+    camera.position.set(0, Math.sin(tilt) * distance, Math.cos(tilt) * distance);
+    camera.lookAt(0, -55, 0);
+
+    const ring = new THREE.Group();
+    ring.rotation.z = (-5 * Math.PI) / 180;
+    scene.add(ring);
+
+    const texture = filmTexture();
+    const geometry = new THREE.CylinderGeometry(radius, radius, band, 192, 1, true);
+    // Start the strip at the back so its seam is hidden.
+    geometry.rotateY(Math.PI);
+    ring.add(new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ map: texture })));
+    ring.add(
+      new THREE.Mesh(
+        geometry,
+        new THREE.MeshLambertMaterial({ map: texture, side: THREE.BackSide, color: "#6d6488" }),
+      ),
+    );
+
+    scene.add(new THREE.AmbientLight("#ffffff", 1.6));
+    const key = new THREE.DirectionalLight("#fff1dc", 2.2);
+    key.position.set(0.3, 0.6, 1);
+    scene.add(key);
+
+    const orbitRadius = radius + 62;
+    const orbit = new THREE.Group();
+    orbit.position.y = -band / 2 + 18;
+    ring.add(orbit);
+    const line = new THREE.Mesh(
+      new THREE.TorusGeometry(orbitRadius, 2.6, 12, 256),
+      new THREE.MeshBasicMaterial({ color: goldLight }),
+    );
+    line.rotation.x = Math.PI / 2;
+    orbit.add(line);
+    for (const [width, opacity] of [
+      [9, 0.22],
+      [18, 0.1],
+    ]) {
+      const halo = new THREE.Mesh(
+        new THREE.TorusGeometry(orbitRadius, width, 12, 256),
+        new THREE.MeshBasicMaterial({
+          color: gold,
+          transparent: true,
+          opacity,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }),
+      );
+      halo.rotation.x = Math.PI / 2;
+      orbit.add(halo);
+    }
+    for (const angle of [-50, 50]) {
+      const a = (angle * Math.PI) / 180;
+      const head = new THREE.Mesh(
+        arrowhead(40),
+        new THREE.MeshBasicMaterial({ color: goldLight, side: THREE.DoubleSide }),
+      );
+      head.position.set(Math.sin(a) * orbitRadius, 0, Math.cos(a) * orbitRadius);
+      head.rotation.y = a;
+      orbit.add(head);
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  let drawn;
+  window.automedia.registerRenderer(() => (drawn ??= draw()));
+</script>

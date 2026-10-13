@@ -1,0 +1,112 @@
+<div class="stage" data-glow="0.5 0.45">
+  <div class="frame">
+    <canvas class="art" width="600" height="600"></canvas>
+    <div class="seam"></div>
+    <div class="knot"></div>
+  </div>
+</div>
+<style>
+  .stage {
+    position: relative;
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6));
+  }
+  .frame {
+    position: relative;
+    width: 600px;
+    height: 600px;
+    border-radius: 300px 300px 26px 26px;
+    overflow: hidden;
+    background: #120e22;
+    outline: 4px solid var(--gold);
+    outline-offset: 12px;
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 12px rgb(23 19 42 / 0.6),
+      0 0 60px 10px rgb(230 192 114 / 0.35);
+  }
+  .art {
+    position: absolute;
+    inset: 0;
+  }
+  .seam {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 2px);
+    width: 4px;
+    background: var(--gold-light);
+    box-shadow: 0 0 24px 6px rgb(230 192 114 / 0.8);
+  }
+  .knot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    margin: -22px 0 0 -22px;
+    transform: rotate(45deg) scaleY(1.3);
+    border-radius: 4px;
+    background: var(--ink);
+    box-shadow:
+      inset 0 0 0 4px var(--gold),
+      inset 0 0 0 10px var(--ink),
+      inset 0 0 0 22px var(--gold-light),
+      0 0 30px rgb(230 192 114 / 0.7);
+  }
+</style>
+<script type="module">
+  // Left: the painting. Right: the same painting written out in its own Base64, in gold.
+  window.automedia.registerRenderer(async () => {
+    const canvas = document.querySelector(".art");
+    const ctx = canvas.getContext("2d");
+    const size = canvas.width;
+    const src = "asset:samples/doorway.webp";
+
+    const [image, bytes] = await Promise.all([
+      new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      }),
+      fetch(src).then((response) => response.arrayBuffer()),
+      document.fonts.load('600 18px "DejaVu Sans Mono"'),
+    ]);
+
+    // The real Base64 of the file, a slice from its middle so it looks like data, not a header.
+    let text = "";
+    const view = new Uint8Array(bytes, 4096, 4096);
+    for (let i = 0; i < view.length; i += 1024) {
+      text += btoa(String.fromCharCode(...view.subarray(i, i + 1024)));
+    }
+
+    // Crop the painting a little toward the door.
+    const crop = 0.96;
+    const sw = image.width * crop;
+    const sx = (image.width - sw) / 2;
+    const sy = image.height * 0.01;
+    ctx.drawImage(image, sx, sy, sw, sw, 0, 0, size, size);
+    const pixels = ctx.getImageData(0, 0, size, size).data;
+
+    // Paint the right half as ink, then write the glyphs over it.
+    ctx.fillStyle = "#120e22";
+    ctx.fillRect(size / 2, 0, size / 2, size);
+    const cw = 7.5;
+    const ch = 11;
+    ctx.font = '600 11px "DejaVu Sans Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    let k = 0;
+    for (let y = 0; y < size; y += ch) {
+      for (let x = size / 2 + 2; x < size; x += cw) {
+        const px = Math.min(size - 1, Math.round(x + cw / 2));
+        const py = Math.min(size - 1, Math.round(y + ch / 2));
+        const i = (py * size + px) * 4;
+        // Each glyph takes the colour of the painting beneath it.
+        const lift = (v) => Math.min(255, v * 1.12 + 10);
+        ctx.fillStyle = `rgb(${lift(pixels[i])} ${lift(pixels[i + 1])} ${lift(pixels[i + 2])})`;
+        ctx.fillText(text[k++ % text.length], x + cw / 2, y + ch / 2);
+      }
+    }
+  });
+</script>

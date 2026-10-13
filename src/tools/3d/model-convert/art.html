@@ -1,0 +1,183 @@
+<div class="stage" data-glow="0.5 0.45">
+  <canvas class="scene" width="2560" height="1600"></canvas>
+  <div class="format from"><span>OBJ</span></div>
+  <div class="format to"><span>GLB</span></div>
+</div>
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+  }
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 1280px;
+    height: 800px;
+    filter: drop-shadow(0 0 10px rgb(230 192 114 / 0.25))
+      drop-shadow(0 40px 50px rgb(10 6 24 / 0.55));
+  }
+  .format {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    margin: -100px 0 0 -100px;
+    display: grid;
+    place-items: center;
+    filter: drop-shadow(0 20px 30px rgb(10 6 24 / 0.6));
+  }
+  .format::before,
+  .format::after {
+    content: "";
+    position: absolute;
+    inset: 30px;
+    transform: rotate(45deg);
+    border-radius: 10px;
+  }
+  .format::before {
+    background: linear-gradient(160deg, #2c2350, var(--ink));
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 11px rgb(23 19 42 / 0.85),
+      0 0 0 14px var(--gold),
+      0 0 40px 12px rgb(230 192 114 / 0.35);
+  }
+  .format span {
+    position: relative;
+    font: 600 62px/1 var(--serif);
+    letter-spacing: 0.04em;
+    color: var(--gold-light);
+    text-shadow: 0 0 18px rgb(230 192 114 / 0.6);
+  }
+</style>
+<script type="module">
+  import { THREE, studio, materials, whenReady } from "asset:art/3d-kit.js";
+
+  async function render() {
+    const canvas = document.querySelector(".scene");
+    const { renderer, scene, camera } = studio(canvas, { fov: 30 });
+    camera.position.set(0, 2.6, 10.5);
+    camera.lookAt(0, 1.45, 0);
+
+    const { marble, gold, ink } = materials();
+    gold.envMapIntensity = 1.6;
+    marble.map.repeat.set(2, 1);
+    // A marble amphora with gold bands and handles.
+    const profile = new THREE.SplineCurve(
+      [
+        [0.36, 0.42],
+        [0.62, 0.7],
+        [0.92, 1.1],
+        [1.0, 1.5],
+        [0.9, 1.9],
+        [0.62, 2.22],
+        [0.42, 2.46],
+        [0.4, 2.72],
+        [0.52, 2.9],
+      ].map(([x, y]) => new THREE.Vector2(x, y)),
+    ).getPoints(80);
+    const body = new THREE.Mesh(
+      new THREE.LatheGeometry(
+        [
+          new THREE.Vector2(0, 0.42),
+          ...profile,
+          new THREE.Vector2(0.46, 2.94),
+          new THREE.Vector2(0.36, 2.8),
+        ],
+        96,
+      ),
+      marble,
+    );
+    const urn = new THREE.Group();
+    urn.add(body);
+    const foot = new THREE.Mesh(
+      new THREE.LatheGeometry(
+        [
+          [0, 0],
+          [0.62, 0],
+          [0.62, 0.1],
+          [0.42, 0.18],
+          [0.3, 0.32],
+          [0.36, 0.44],
+          [0, 0.44],
+        ].map(([x, y]) => new THREE.Vector2(x, y)),
+        96,
+      ),
+      gold,
+    );
+    urn.add(foot);
+    for (const [y, r, t] of [
+      [1.5, 1.0, 0.045],
+      [2.46, 0.42, 0.04],
+      [2.9, 0.52, 0.05],
+      [0.7, 0.62, 0.035],
+    ]) {
+      const band = new THREE.Mesh(new THREE.TorusGeometry(r, t, 16, 120), gold);
+      band.rotation.x = Math.PI / 2;
+      band.position.y = y;
+      urn.add(band);
+    }
+    for (const side of [-1, 1]) {
+      const curve = new THREE.CatmullRomCurve3(
+        [
+          [0.4, 2.5],
+          [0.95, 2.66],
+          [1.2, 2.4],
+          [1.02, 1.95],
+          [0.9, 1.82],
+        ].map(([x, y]) => new THREE.Vector3(x * side, y, 0)),
+      );
+      urn.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 64, 0.06, 16), gold));
+    }
+    const plinth = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 1.05, 0.2, 96), ink);
+    plinth.position.y = -0.1;
+    urn.add(plinth);
+    urn.rotation.y = 0.5;
+    scene.add(urn);
+
+    // Two gold arrows orbit the urn, one each way between the formats.
+    const orbit = new THREE.Group();
+    orbit.position.y = 1.45;
+    orbit.rotation.set(0.32, 0, 0.06);
+    scene.add(orbit);
+    const radius = 2.75,
+      gap = 0.6;
+    // Both arrows run clockwise seen from above: over the back from OBJ to GLB, across the
+    // front from GLB back to OBJ.
+    for (const start of [gap, Math.PI + gap]) {
+      const length = Math.PI - gap * 2,
+        tip = 0.22;
+      const arc = new THREE.Mesh(
+        new THREE.TorusGeometry(radius, 0.06, 16, 160, length - tip),
+        gold,
+      );
+      arc.rotation.x = -Math.PI / 2;
+      arc.rotation.order = "YXZ";
+      arc.rotation.y = start + tip;
+      orbit.add(arc);
+      const angle = start + tip;
+      const head = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.46, 32), gold);
+      head.position.set(Math.cos(angle) * radius, 0, -Math.sin(angle) * radius);
+      head.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        new THREE.Vector3(Math.sin(angle), 0, Math.cos(angle)),
+      );
+      head.position.addScaledVector(new THREE.Vector3(Math.sin(angle), 0, Math.cos(angle)), 0.12);
+      orbit.add(head);
+    }
+
+    renderer.render(scene, camera);
+
+    // Pin the format medallions to the gaps in the orbit.
+    orbit.updateMatrixWorld(true);
+    for (const [selector, x] of [
+      [".from", -radius],
+      [".to", radius],
+    ]) {
+      const point = orbit.localToWorld(new THREE.Vector3(x, 0, 0)).project(camera);
+      const element = document.querySelector(selector);
+      element.style.left = `${((point.x + 1) / 2) * 1280}px`;
+      element.style.top = `${((1 - point.y) / 2) * 800}px`;
+    }
+  }
+  whenReady(render());
+</script>

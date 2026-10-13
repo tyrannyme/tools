@@ -1,0 +1,111 @@
+<div class="scene" data-glow="0.42 0.5">
+  <div class="film">
+    <div class="holes"></div>
+    <div class="shot"></div>
+    <div class="holes"></div>
+  </div>
+  <svg class="wave" viewBox="0 0 1280 800">
+    <defs>
+      <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#a97c34" />
+        <stop offset="0.38" stop-color="#e6c072" />
+        <stop offset="0.5" stop-color="#fff4d6" />
+        <stop offset="0.62" stop-color="#e6c072" />
+        <stop offset="1" stop-color="#a97c34" />
+      </linearGradient>
+      <linearGradient id="thread" gradientUnits="userSpaceOnUse" x1="440" y1="0" x2="590" y2="0">
+        <stop offset="0" stop-color="#f8e6b8" stop-opacity="0" />
+        <stop offset="1" stop-color="#f8e6b8" />
+      </linearGradient>
+    </defs>
+    <g class="thread">
+      <path d="M440 400 H1212" stroke="url(#thread)" />
+      <path d="M1228 386 L1242 400 L1228 414 L1214 400 Z" />
+    </g>
+    <g class="bars" fill="url(#bar)"></g>
+  </svg>
+</div>
+<style>
+  .scene {
+    position: relative;
+    width: 1280px;
+    height: 800px;
+  }
+  .wave {
+    position: absolute;
+    inset: 0;
+  }
+  .thread {
+    fill: var(--gold-light);
+    stroke: var(--gold-light);
+    stroke-width: 2.5;
+    filter: var(--glow);
+  }
+  .bars {
+    filter: drop-shadow(0 0 14px rgb(230 192 114 / 0.6)) drop-shadow(0 0 2px rgb(248 230 184 / 0.7));
+  }
+  .film {
+    position: absolute;
+    left: 90px;
+    top: 50%;
+    width: 500px;
+    height: 400px;
+    margin-top: -200px;
+    display: grid;
+    grid-template-columns: 46px 1fr 46px;
+    border-radius: 18px;
+    padding: 16px 0;
+    background: #0f0c1d;
+    transform: rotate(-4deg);
+    box-shadow:
+      inset 0 0 0 3px var(--gold),
+      inset 0 0 0 9px #0f0c1d,
+      inset 0 0 0 11px rgb(230 192 114 / 0.5),
+      0 40px 70px rgb(10 6 24 / 0.65);
+  }
+  .holes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+  }
+  .holes i {
+    width: 20px;
+    height: 22px;
+    border-radius: 5px;
+    box-shadow: inset 0 0 0 2px rgb(230 192 114 / 0.8);
+  }
+  .shot {
+    border-radius: 8px;
+    background: url("asset:samples/doorway.webp") 50% 30% / 150% auto;
+    box-shadow: inset 0 0 0 2px rgb(230 192 114 / 0.6);
+  }
+</style>
+<script type="module">
+  for (const row of document.querySelectorAll(".holes")) row.innerHTML = "<i></i>".repeat(8);
+
+  // The real loudness of the sample video's soundtrack: six plucked notes and their decay.
+  const peaks = [
+    0.029, 0.056, 0.062, 0.067, 0.064, 0.071, 0.358, 0.28, 0.223, 0.177, 0.158, 0.142, 0.694, 0.506,
+    0.38, 0.294, 0.245, 0.226, 1.0, 0.683, 0.468, 0.348, 0.264, 0.231, 0.991, 0.686, 0.478, 0.333,
+    0.277, 0.218, 0.997, 0.686, 0.47, 0.35, 0.264, 0.232, 0.988, 0.69, 0.474, 0.346, 0.271, 0.227,
+    0.99, 0.685, 0.481, 0.34, 0.274, 0.228, 0.997, 0.685, 0.484, 0.346, 0.266, 0.233, 0.985, 0.692,
+    0.483, 0.342, 0.276, 0.224, 0.988, 0.688, 0.483, 0.347, 0.269, 0.234, 0.98, 0.699, 0.476, 0.352,
+    0.269, 0.231, 0.978, 0.691, 0.482, 0.354, 0.269, 0.231, 0.957, 0.645, 0.415, 0.288, 0.202,
+    0.164, 0.63, 0.413, 0.257, 0.17, 0.116, 0.083, 0.304, 0.181, 0.099, 0.052, 0.025, 0.009,
+  ];
+  const left = 540;
+  const right = 1200;
+  const middle = 400;
+  const height = 190;
+  const pitch = (right - left) / peaks.length;
+  const width = pitch * 0.58;
+  document.querySelector(".bars").innerHTML = peaks
+    .map((peak, i) => {
+      const h = Math.max(6, peak * height);
+      const x = left + i * pitch;
+      return `<rect x="${x}" y="${middle - h}" width="${width}" height="${h * 2}" rx="${width / 2}" />`;
+    })
+    .join("");
+</script>

@@ -1,0 +1,50 @@
+<div class="stage" data-glow="0.5 0.5">
+  <div class="frame large"><img src="asset:samples/door.webp" alt="" /></div>
+  <div class="frame medium"><img src="asset:samples/door.webp" alt="" /></div>
+  <div class="frame small"><img src="asset:samples/door.webp" alt="" /></div>
+</div>
+<style>
+  .stage {
+    position: relative;
+    width: 1000px;
+    height: 600px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 44px;
+  }
+  .frame {
+    position: relative;
+    flex: none;
+    border-radius: 999px 999px 18px 18px;
+    background: radial-gradient(circle at 50% 45%, rgb(80 60 120 / 0.9), rgb(23 19 42 / 0.95) 75%);
+    outline: 3px solid var(--gold);
+    outline-offset: 9px;
+    box-shadow:
+      0 0 0 3px var(--gold),
+      0 0 0 9px rgb(23 19 42 / 0.6),
+      0 0 50px 8px rgb(230 192 114 / 0.3),
+      var(--shadow);
+  }
+  .frame img {
+    position: absolute;
+    inset: 8%;
+    width: 84%;
+    height: 84%;
+    object-fit: contain;
+    object-position: 50% 70%;
+    filter: drop-shadow(0 20px 20px rgb(10 6 24 / 0.6));
+  }
+  .large {
+    width: 400px;
+    height: 560px;
+  }
+  .medium {
+    width: 240px;
+    height: 336px;
+  }
+  .small {
+    width: 140px;
+    height: 196px;
+  }
+</style>

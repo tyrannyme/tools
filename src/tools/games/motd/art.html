@@ -1,0 +1,129 @@
+<div class="stage" data-glow="0.5 0.42">
+  <div class="plaque">
+    <canvas id="motd"></canvas>
+    <svg class="corners line" viewBox="0 0 860 430" preserveAspectRatio="none">
+      <path d="M26 86 V26 H86 M774 26 H834 V86 M834 344 V404 H774 M86 404 H26 V344" />
+      <path class="fine" d="M40 70 V40 H70 M790 40 H820 V70 M820 360 V390 H790 M70 390 H40 V360" />
+    </svg>
+  </div>
+  <div class="seal">§</div>
+  <div class="lozenge left"></div>
+  <div class="lozenge right"></div>
+</div>
+<style>
+  .stage {
+    position: relative;
+    width: 900px;
+    height: 520px;
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6));
+  }
+  .plaque {
+    position: absolute;
+    inset: 60px 20px 10px;
+    display: grid;
+    place-items: center;
+    border-radius: 26px;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgb(60 46 104 / 0.6), transparent 70%),
+      linear-gradient(170deg, rgb(32 25 58 / 0.96), rgb(16 12 30 / 0.97));
+    outline: 4px solid var(--gold);
+    outline-offset: 12px;
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 12px rgb(23 19 42 / 0.6),
+      0 0 60px 10px rgb(230 192 114 / 0.3);
+  }
+  .plaque canvas {
+    margin-top: 40px;
+  }
+  .corners {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    stroke-width: 3;
+    opacity: 0.85;
+  }
+  .corners .fine {
+    stroke-width: 1.5;
+    opacity: 0.7;
+  }
+  .seal {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 124px;
+    height: 124px;
+    margin-left: -62px;
+    display: grid;
+    place-items: center;
+    padding-bottom: 6px;
+    border-radius: 50%;
+    background: var(--ink);
+    box-shadow:
+      inset 0 0 0 4px var(--gold),
+      inset 0 0 0 10px var(--ink),
+      inset 0 0 0 12px var(--gold-deep),
+      0 0 40px rgb(230 192 114 / 0.6);
+    color: var(--gold-light);
+    font: 600 84px/1 var(--serif);
+    text-shadow: 0 0 18px rgb(230 192 114 / 0.8);
+  }
+  .lozenge {
+    position: absolute;
+    top: 50%;
+    width: 34px;
+    height: 34px;
+    margin-top: 12px;
+    background: var(--ink);
+    box-shadow:
+      inset 0 0 0 4px var(--gold),
+      0 0 24px rgb(230 192 114 / 0.6);
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .left {
+    left: 3px;
+  }
+  .right {
+    right: 3px;
+  }
+</style>
+<script type="module">
+  import { canvas, drawText, textWidth } from "asset:art/pixels.js";
+
+  const mc = {
+    gold: ["#ffaa00", "#3f2a00"],
+    aqua: ["#55ffff", "#153f3f"],
+    purple: ["#ff55ff", "#3f153f"],
+    gray: ["#aaaaaa", "#2a2a2a"],
+  };
+  function draw() {
+    const width = 820;
+    const context = canvas(document.getElementById("motd"), width, 260);
+    const line = (runs, y, size) => {
+      const total = runs.reduce(
+        (sum, run, index) => sum + textWidth(run.text, run.bold) + (index ? 4 : 0),
+        0,
+      );
+      let x = Math.round((width - total * size) / 2 / size) * size;
+      for (const run of runs) {
+        drawText(context, run.text, x, y, size, run.color[0], {
+          bold: run.bold,
+          shadow: run.color[1],
+        });
+        x += (textWidth(run.text, run.bold) + 4) * size;
+      }
+    };
+    line([{ text: "TYRANNY", color: mc.gold, bold: true }], 0, 14);
+    line(
+      [
+        { text: "SURVIVAL", color: mc.aqua },
+        { text: "SMP", color: mc.purple, bold: true },
+      ],
+      150,
+      10,
+    );
+  }
+  if (window.automedia) window.automedia.registerRenderer(async () => draw());
+  else draw();
+</script>

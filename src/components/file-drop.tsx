@@ -19,6 +19,8 @@ interface FileDropProps {
   hint?: string;
   /** Extra controls under the hint, such as a "Try a sample" button. */
   children?: ReactNode;
+  /** A single row instead of a large panel, for use next to other inputs or once a file is loaded. */
+  compact?: boolean;
   className?: string;
 }
 
@@ -32,6 +34,7 @@ export function FileDrop({
   title,
   hint,
   children,
+  compact,
   className,
 }: FileDropProps) {
   const id = useId();
@@ -61,15 +64,23 @@ export function FileDrop({
         if (files.length) onFiles(multiple ? files : files.slice(0, 1));
       }}
       className={cn(
-        "relative flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed bg-muted/30 px-6 py-12 text-center transition-colors",
+        "relative flex rounded-xl border border-dashed bg-muted/30 transition-colors has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-[3px] has-[input:focus-visible]:ring-ring/50",
+        compact
+          ? "flex-row items-center gap-3 px-4 py-3 text-left"
+          : "flex-col items-center justify-center gap-3 px-6 py-12 text-center",
         dragging && "border-gold bg-gold/5",
         className,
       )}
     >
-      <div className="flex size-12 items-center justify-center rounded-full bg-gold/10 text-gold">
-        <Icon className="size-6" aria-hidden="true" />
+      <div
+        className={cn(
+          "flex shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold",
+          compact ? "size-9" : "size-12",
+        )}
+      >
+        <Icon className={compact ? "size-4" : "size-6"} aria-hidden="true" />
       </div>
-      <div className="space-y-1">
+      <div className={cn("space-y-1", compact && "min-w-0 flex-1 space-y-0.5")}>
         <label htmlFor={id} className="cursor-pointer font-medium after:absolute after:inset-0">
           {title}
         </label>
@@ -88,7 +99,9 @@ export function FileDrop({
         }}
       />
       {children && (
-        <div className="relative z-10 flex flex-wrap justify-center gap-2">{children}</div>
+        <div className={cn("relative z-10 flex flex-wrap gap-2", !compact && "justify-center")}>
+          {children}
+        </div>
       )}
     </div>
   );

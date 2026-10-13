@@ -1,0 +1,139 @@
+<div class="stage" data-glow="0.5 0.42">
+  <div class="frame">
+    <div class="half photo">
+      <div class="text">
+        <p class="over">Tools by</p>
+        <h1>Tyranny</h1>
+        <p>Free tools that run in your browser.</p>
+      </div>
+    </div>
+    <div class="half digital">
+      <div class="text">
+        <p class="over">Tools by</p>
+        <h1>Tyranny</h1>
+        <p>Free tools that run in your browser.</p>
+      </div>
+    </div>
+  </div>
+  <div class="scan"></div>
+  <svg class="end left" viewBox="0 0 40 40"><path d="M20 4 L36 20 L20 36 L4 20 Z" /></svg>
+  <svg class="end right" viewBox="0 0 40 40"><path d="M20 4 L36 20 L20 36 L4 20 Z" /></svg>
+</div>
+<style>
+  .stage {
+    margin-top: 30px;
+    --seam: 58.5%;
+    position: relative;
+    width: 780px;
+    height: 560px;
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6));
+  }
+  .frame {
+    position: absolute;
+    inset: 0;
+    border-radius: 390px 390px 26px 26px / 150px 150px 26px 26px;
+    overflow: hidden;
+    outline: 4px solid var(--gold);
+    outline-offset: 12px;
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 12px rgb(23 19 42 / 0.6),
+      0 0 60px 10px rgb(230 192 114 / 0.35);
+  }
+  .half {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding-top: 50px;
+  }
+  .text {
+    text-align: center;
+    font-family: var(--serif);
+    font-weight: 600;
+  }
+  .text h1 {
+    margin: -10px 0 40px;
+    font-size: 210px;
+    line-height: 1;
+    font-weight: 600;
+  }
+  .text p {
+    margin: 0;
+    font-size: 48px;
+    line-height: 1.2;
+  }
+  .text .over {
+    font-size: 72px;
+  }
+  /* Below the scan: a photo of a printed page, soft and unevenly lit. */
+  .photo {
+    clip-path: inset(var(--seam) 0 0 0);
+    background:
+      radial-gradient(ellipse 90% 80% at 30% 20%, rgb(255 248 236 / 0.5), rgb(255 248 236 / 0) 60%),
+      radial-gradient(ellipse 120% 120% at 50% 40%, rgb(0 0 0 / 0) 50%, rgb(60 40 70 / 0.35)),
+      linear-gradient(170deg, #f6ecdc, #d9c7ae);
+    color: #2a2234;
+  }
+  .photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.38 0 0 0 0 0.3 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .photo .text {
+    filter: blur(1.4px);
+    opacity: 0.88;
+  }
+  /* Above the scan: the same words as crisp, selectable text. */
+  .digital {
+    clip-path: inset(0 0 calc(100% - var(--seam)) 0);
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 70%, rgb(230 192 114 / 0.16), transparent 70%),
+      linear-gradient(170deg, #2c2350, #17132a 80%);
+    color: var(--gold-light);
+  }
+  .digital .text {
+    filter: drop-shadow(0 0 14px rgb(230 192 114 / 0.5));
+  }
+  .scan {
+    position: absolute;
+    top: calc(var(--seam) - 2px);
+    left: -70px;
+    right: -70px;
+    height: 5px;
+    margin-top: -0.5px;
+    border-radius: 3px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--gold-light) 10%,
+      var(--gold-light) 90%,
+      transparent
+    );
+    box-shadow:
+      0 0 16px 5px rgb(230 192 114 / 0.9),
+      0 0 50px 12px rgb(230 192 114 / 0.45);
+  }
+  .end {
+    position: absolute;
+    top: calc(var(--seam) - 20px);
+    width: 40px;
+    height: 40px;
+    fill: var(--ink);
+    stroke: var(--gold);
+    stroke-width: 4;
+    filter: drop-shadow(0 0 12px rgb(230 192 114 / 0.8));
+  }
+  .end.left {
+    left: -40px;
+  }
+  .end.right {
+    right: -40px;
+  }
+</style>
+<script type="module">
+  window.automedia?.registerRenderer(() => document.fonts.ready.catch(() => {}));
+</script>

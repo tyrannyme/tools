@@ -10,7 +10,7 @@ interface PageSeo {
 }
 
 /** Title, description, canonical URL, and social preview tags for a page. */
-export function seo({ title, description, path, image = "/og/home.png" }: PageSeo) {
+export function seo({ title, description, path, image = "/og/home.jpg" }: PageSeo) {
   const url = siteUrl + path;
   const imageUrl = siteUrl + image;
   return {

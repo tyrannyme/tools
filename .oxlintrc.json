@@ -8,7 +8,8 @@
     "dist/**",
     "src/routeTree.gen.ts",
     "proposals/image-resize.html",
-    "src/env.d.ts"
+    "src/env.d.ts",
+    ".claude/**"
   ],
   "overrides": [
     {

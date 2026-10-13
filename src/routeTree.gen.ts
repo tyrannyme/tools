@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as CategoryIndexRouteImport } from './routes/$category/index'
 import { Route as CategoryToolRouteImport } from './routes/$category/$tool'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoryIndexRoute = CategoryIndexRouteImport.update({
@@ -31,30 +37,34 @@ const CategoryToolRoute = CategoryToolRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$category/$tool': typeof CategoryToolRoute
   '/$category/': typeof CategoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$category/$tool': typeof CategoryToolRoute
   '/$category': typeof CategoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$category/$tool': typeof CategoryToolRoute
   '/$category/': typeof CategoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$category/$tool' | '/$category/'
+  fullPaths: '/' | '/sitemap.xml' | '/$category/$tool' | '/$category/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$category/$tool' | '/$category'
-  id: '__root__' | '/' | '/$category/$tool' | '/$category/'
+  to: '/' | '/sitemap.xml' | '/$category/$tool' | '/$category'
+  id: '__root__' | '/' | '/sitemap.xml' | '/$category/$tool' | '/$category/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CategoryToolRoute: typeof CategoryToolRoute
   CategoryIndexRoute: typeof CategoryIndexRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$category/': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   CategoryToolRoute: CategoryToolRoute,
   CategoryIndexRoute: CategoryIndexRoute,
 }

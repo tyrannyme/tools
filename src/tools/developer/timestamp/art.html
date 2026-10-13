@@ -1,0 +1,222 @@
+<div class="stage" data-glow="0.5 0.5">
+  <svg viewBox="0 0 700 760" width="590" height="640">
+    <defs>
+      <radialGradient id="plate" cx="45%" cy="38%" r="70%">
+        <stop offset="0" stop-color="#352a5c" />
+        <stop offset="1" stop-color="#120e22" />
+      </radialGradient>
+      <linearGradient id="metal" x1="0" y1="0" x2="0.4" y2="1">
+        <stop offset="0" stop-color="#f8e6b8" />
+        <stop offset="0.5" stop-color="#e6c072" />
+        <stop offset="1" stop-color="#a97c34" />
+      </linearGradient>
+      <path id="ecliptic" d="M350 412 m-118 0 a118 118 0 1 1 236 0 a118 118 0 1 1 -236 0" />
+    </defs>
+
+    <!-- The throne and shackle the astrolabe hangs from. -->
+    <g class="throne">
+      <circle cx="350" cy="62" r="30" class="ring" />
+      <path
+        class="crown"
+        d="M232 172 C246 146 292 146 314 124 C330 108 338 98 350 90 C362 98 370 108 386 124 C408 146 454 146 468 172 Z"
+      />
+      <path class="scroll" d="M262 150 C244 150 236 132 250 124 C262 117 274 128 266 138" />
+      <path class="scroll" d="M438 150 C456 150 464 132 450 124 C438 117 426 128 434 138" />
+      <path class="gem" d="M350 112 l11 18 l-11 18 l-11 -18 Z" />
+    </g>
+
+    <!-- The mater: rim, hour scale, and the engraved plate. -->
+    <circle cx="350" cy="440" r="292" fill="url(#metal)" class="rim" />
+    <circle cx="350" cy="440" r="276" fill="url(#plate)" />
+    <circle cx="350" cy="440" r="268" class="hair" />
+    <g class="ticks"></g>
+    <g class="numerals"></g>
+    <circle cx="350" cy="440" r="196" class="hair" />
+    <g class="plate"></g>
+
+    <!-- The rete: an openwork star map with the ecliptic ring. -->
+    <g class="rete">
+      <circle cx="350" cy="412" r="132" class="band" />
+      <circle cx="350" cy="412" r="104" class="band thin" />
+      <text class="epoch">
+        <textPath href="#ecliptic" startOffset="25%" text-anchor="middle">1760361600</textPath>
+      </text>
+      <g class="stars"></g>
+    </g>
+
+    <!-- Hands. -->
+    <g class="hands">
+      <g transform="rotate(-60 350 440)">
+        <path class="hand" d="M350 440 L350 340 M350 306 L350 290" />
+        <circle class="pomme" cx="350" cy="323" r="16" />
+        <path class="tip" d="M350 262 l11 28 l-22 0 Z" />
+      </g>
+      <g transform="rotate(50 350 440)">
+        <path class="hand thin" d="M350 440 L350 290 M350 260 L350 240" />
+        <circle class="pomme thin" cx="350" cy="275" r="14" />
+        <path class="tip" d="M350 206 l9 34 l-18 0 Z" />
+      </g>
+      <circle cx="350" cy="440" r="20" class="pin" />
+      <path class="gem" d="M350 428 l8 12 l-8 12 l-8 -12 Z" />
+    </g>
+  </svg>
+</div>
+<style>
+  .stage {
+    position: relative;
+    margin-top: -8px;
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6)) drop-shadow(0 0 40px rgb(230 192 114 / 0.3));
+  }
+  svg {
+    display: block;
+  }
+  .ring {
+    fill: none;
+    stroke: url(#metal);
+    stroke-width: 12;
+  }
+  .crown {
+    fill: url(#metal);
+  }
+  .gem {
+    fill: #fff6dc;
+    filter: drop-shadow(0 0 8px rgb(248 230 184 / 0.9));
+  }
+  .rim {
+    filter: drop-shadow(0 0 2px rgb(23 19 42 / 0.6));
+  }
+  .hair {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 2.5;
+  }
+  .ticks line {
+    stroke: var(--gold);
+    stroke-linecap: round;
+  }
+  .numerals text {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 27px;
+    fill: var(--gold-light);
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .plate circle,
+  .plate line {
+    fill: none;
+    stroke: rgb(230 192 114 / 0.35);
+    stroke-width: 1.5;
+  }
+  .rete {
+    filter: drop-shadow(0 4px 6px rgb(10 6 24 / 0.7)) drop-shadow(0 0 10px rgb(230 192 114 / 0.4));
+  }
+  .band {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 6;
+  }
+  .band.thin {
+    stroke-width: 3;
+  }
+  .epoch {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: 2px;
+    fill: var(--gold-light);
+  }
+  .pointer {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+  .stars path {
+    fill: var(--gold-light);
+  }
+  .hand {
+    stroke: url(#metal);
+    stroke: var(--gold-light);
+    stroke-width: 9;
+    stroke-linecap: round;
+  }
+  .hands {
+    filter: drop-shadow(0 6px 8px rgb(10 6 24 / 0.7)) drop-shadow(0 0 12px rgb(230 192 114 / 0.5));
+  }
+  .tip {
+    fill: var(--gold-light);
+  }
+  .pomme {
+    fill: none;
+    stroke: var(--gold-light);
+    stroke-width: 7;
+  }
+  .hand.thin,
+  .pomme.thin {
+    stroke-width: 6;
+  }
+  .scroll {
+    fill: none;
+    stroke: url(#metal);
+    stroke-width: 7;
+    stroke-linecap: round;
+  }
+  .pin {
+    fill: url(#metal);
+    stroke: #17132a;
+    stroke-width: 3;
+  }
+</style>
+<script type="module">
+  const ns = "http://www.w3.org/2000/svg";
+  const make = (parent, name, attrs) => {
+    const node = document.createElementNS(ns, name);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    document.querySelector(parent).append(node);
+    return node;
+  };
+  const cx = 350;
+  const cy = 440;
+  const at = (r, turn) => [
+    cx + r * Math.sin(turn * 2 * Math.PI),
+    cy - r * Math.cos(turn * 2 * Math.PI),
+  ];
+
+  // The hour scale: 24 hours in quarter-hour steps.
+  for (let i = 0; i < 96; i++) {
+    const major = i % 4 === 0;
+    const [x1, y1] = at(268, i / 96);
+    const [x2, y2] = at(major ? 238 : 254, i / 96);
+    make(".ticks", "line", { x1, y1, x2, y2, "stroke-width": major ? 4 : 2 });
+  }
+  // Roman hours, twice round, as on a real astrolabe.
+  const roman = ["XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI"];
+  for (let i = 0; i < 24; i++) {
+    const [x, y] = at(217, i / 24);
+    const text = make(".numerals", "text", {
+      x,
+      y,
+      transform: `rotate(${(i / 24) * 360} ${x} ${y})`,
+    });
+    text.textContent = roman[i % 12];
+  }
+  // Engraved almucantars: circles that crowd toward the zenith.
+  for (let i = 0; i < 7; i++) {
+    const r = 186 - i * 24;
+    make(".plate", "circle", { cx, cy: cy - 40 + i * 6, r });
+  }
+  for (let i = 0; i < 12; i++) {
+    const [x1, y1] = at(40, i / 12);
+    const [x2, y2] = at(196, i / 12);
+    make(".plate", "line", { x1, y1, x2, y2 });
+  }
+  // Star pointers on the rete: small flames at the end of each arm.
+  // Jewels set into the ecliptic ring.
+  for (let i = 0; i < 7; i++) {
+    const t = (0.2 + i * 0.1) * 2 * Math.PI;
+    const x = cx + 118 * Math.sin(t);
+    const y = 412 - 118 * Math.cos(t);
+    make(".stars", "path", { d: `M${x} ${y - 13} l9 13 l-9 13 l-9 -13 Z` });
+  }
+</script>

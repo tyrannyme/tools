@@ -1,0 +1,106 @@
+<div class="stage" data-glow="0.5 0.42">
+  <canvas class="scene" width="2560" height="1600"></canvas>
+</div>
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+  }
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 1280px;
+    height: 800px;
+    filter: drop-shadow(0 40px 50px rgb(10 6 24 / 0.55));
+  }
+</style>
+<script type="module">
+  import { THREE, studio, sculpture, whenReady } from "asset:art/3d-kit.js";
+
+  async function render() {
+    const canvas = document.querySelector(".scene");
+    const { renderer, scene, camera } = studio(canvas, { fov: 30 });
+
+    // Eighteen frames of one full turn, rendered from the sculpture itself.
+    const count = 18,
+      frame = 256,
+      gap = 40,
+      margin = 56;
+    const film = document.createElement("canvas");
+    film.width = count * (frame + gap);
+    film.height = frame + margin * 2;
+    const strip = film.getContext("2d");
+    strip.fillStyle = "#120e20";
+    strip.fillRect(0, 0, film.width, film.height);
+    const model = sculpture();
+    scene.add(model);
+    const shot = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+    shot.position.set(0, 2.4, 7.6);
+    shot.lookAt(0, 1.35, 0);
+    scene.background = new THREE.Color(0x2a2046);
+    renderer.setPixelRatio(1);
+    renderer.setSize(frame, frame, false);
+    for (let i = 0; i < count; i++) {
+      model.rotation.y = (i / count) * Math.PI * 2;
+      renderer.render(scene, shot);
+      strip.drawImage(
+        canvas,
+        0,
+        0,
+        frame,
+        frame,
+        i * (frame + gap) + gap / 2,
+        margin,
+        frame,
+        frame,
+      );
+    }
+    // Sprocket holes cut through the film, with gold hairlines along both edges.
+    strip.globalCompositeOperation = "destination-out";
+    for (let x = 14; x < film.width; x += 50)
+      for (const y of [14, film.height - 40]) {
+        strip.beginPath();
+        strip.roundRect(x, y, 26, 26, 6);
+        strip.fill();
+      }
+    strip.globalCompositeOperation = "source-over";
+    strip.fillStyle = "#e6c072";
+    strip.fillRect(0, 46, film.width, 4);
+    strip.fillRect(0, film.height - 50, film.width, 4);
+
+    scene.background = null;
+    renderer.setPixelRatio(2);
+    renderer.setSize(1280, 800, false);
+    camera.position.set(0, 5.0, 10.9);
+    camera.lookAt(0, 0.62, 0);
+    model.rotation.y = -0.5;
+
+    const radius = 3.1;
+    const texture = new THREE.CanvasTexture(film);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 8;
+    const ribbon = new THREE.Mesh(
+      new THREE.CylinderGeometry(
+        radius,
+        radius,
+        ((2 * Math.PI * radius) / count) * (film.height / (frame + gap)),
+        180,
+        1,
+        true,
+      ),
+      new THREE.MeshStandardMaterial({
+        map: texture,
+        side: THREE.DoubleSide,
+        alphaTest: 0.5,
+        roughness: 0.45,
+        metalness: 0.1,
+      }),
+    );
+    ribbon.position.y = 0.5;
+    ribbon.rotation.set(0.05, 0, -0.1);
+    scene.add(ribbon);
+
+    renderer.render(scene, camera);
+  }
+  whenReady(render());
+</script>

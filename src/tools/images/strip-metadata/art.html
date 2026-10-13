@@ -1,0 +1,88 @@
+<div class="stage" data-glow="0.42 0.5">
+  <div class="frame"><img src="asset:samples/doorway.webp" alt="" /></div>
+  <svg class="drift line glow" viewBox="0 0 1000 620">
+    <g transform="translate(50 0)">
+      <!-- A location pin, a camera, and a date leave the photo and turn to dust. -->
+      <g transform="translate(560 214) rotate(-8) scale(1.32)">
+        <circle r="62" class="medal" />
+        <circle r="72" class="ring" />
+        <path d="M0 34 C-14 14 -26 2 -26 -12 A26 26 0 0 1 26 -12 C26 2 14 14 0 34 Z" />
+        <circle cy="-12" r="9" />
+      </g>
+      <g transform="translate(752 146) rotate(10) scale(1.08)" opacity="0.75">
+        <circle r="62" class="medal" />
+        <circle r="72" class="ring" />
+        <path d="M-32 -14 H-14 L-8 -24 H8 L14 -14 H32 V24 H-32 Z" />
+        <circle cy="4" r="12" />
+      </g>
+      <g transform="translate(904 92) rotate(-12) scale(0.86)" opacity="0.45">
+        <circle r="62" class="medal" />
+        <circle r="72" class="ring" />
+        <rect x="-28" y="-24" width="56" height="50" rx="6" />
+        <path d="M-28 -8 H28 M-14 -34 V-16 M14 -34 V-16" />
+      </g>
+      <g class="dust">
+        <path d="M640 250.8 L647 262 L640 273.2 L633 262 Z" opacity="1" />
+        <path d="M664 218.0 L669 226 L664 234.0 L659 226 Z" opacity="0.9" />
+        <path d="M800 186.4 L806 196 L800 205.6 L794 196 Z" opacity="0.85" />
+        <path d="M822 153.6 L826 160 L822 166.4 L818 160 Z" opacity="0.8" />
+        <path d="M842 178.8 L846.5 186 L842 193.2 L837.5 186 Z" opacity="0.75" />
+        <path d="M948 131.2 L953.5 140 L948 148.8 L942.5 140 Z" opacity="0.7" />
+        <path d="M966 89.6 L970 96 L966 102.4 L962 96 Z" opacity="0.6" />
+        <path d="M984 118.4 L987.5 124 L984 129.6 L980.5 124 Z" opacity="0.55" />
+        <path d="M992 65.2 L995 70 L992 74.8 L989 70 Z" opacity="0.45" />
+        <path d="M1006 100.0 L1008.5 104 L1006 108.0 L1003.5 104 Z" opacity="0.4" />
+        <path d="M938 47.2 L941 52 L938 56.8 L935 52 Z" opacity="0.45" />
+        <path d="M1016 48.8 L1018 52 L1016 55.2 L1014 52 Z" opacity="0.3" />
+      </g>
+    </g>
+  </svg>
+</div>
+<style>
+  .stage {
+    position: relative;
+    width: 1000px;
+    height: 620px;
+  }
+  .frame {
+    position: absolute;
+    left: 130px;
+    top: 90px;
+    width: 440px;
+    height: 480px;
+    border-radius: 220px 220px 24px 24px;
+    overflow: hidden;
+    outline: 4px solid var(--gold);
+    outline-offset: 12px;
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 12px rgb(23 19 42 / 0.6),
+      0 0 60px 10px rgb(230 192 114 / 0.35),
+      0 40px 80px rgb(10 6 24 / 0.6);
+  }
+  .frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .drift {
+    overflow: visible;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    stroke-width: 5;
+  }
+  .medal {
+    fill: rgb(23 19 42 / 0.85);
+    stroke-width: 4;
+  }
+  .ring {
+    stroke-width: 2;
+    opacity: 0.6;
+  }
+  .dust path {
+    fill: var(--gold-light);
+    stroke: none;
+  }
+</style>

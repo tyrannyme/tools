@@ -1,0 +1,242 @@
+<div class="stage" data-glow="0.45 0.35">
+  <canvas class="scene" width="2560" height="1600"></canvas>
+</div>
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+  }
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 1280px;
+    height: 800px;
+    filter: drop-shadow(0 0 14px rgb(230 192 114 / 0.35))
+      drop-shadow(0 40px 50px rgb(10 6 24 / 0.6));
+  }
+</style>
+<script type="module">
+  import {
+    THREE,
+    studio,
+    marbleCanvas,
+    normalMap,
+    toCanvas,
+    canvasTexture,
+    whenReady,
+  } from "asset:art/3d-kit.js";
+
+  /**
+   * One tile of gold filigree on ink marble. Medallions sit on the tile's center and corners, beads
+   * on its edge midpoints, and a lozenge joins them, so the shapes only complete across tile edges.
+   */
+  function filigree(size) {
+    const mask = document.createElement("canvas");
+    mask.width = mask.height = size;
+    const g = mask.getContext("2d");
+    g.fillStyle = "#000";
+    g.fillRect(0, 0, size, size);
+    g.strokeStyle = g.fillStyle = "#fff";
+    g.lineCap = g.lineJoin = "round";
+    const u = size;
+    const ring = (x, y, r, width) => {
+      g.lineWidth = width;
+      g.beginPath();
+      g.arc(x, y, r, 0, Math.PI * 2);
+      g.stroke();
+    };
+    const rosette = (x, y, r, petals, turn = 0) => {
+      for (let i = 0; i < petals; i++) {
+        const angle = turn + (i / petals) * Math.PI * 2;
+        g.beginPath();
+        g.ellipse(
+          x + Math.cos(angle) * r * 0.52,
+          y + Math.sin(angle) * r * 0.52,
+          r * 0.46,
+          r * 0.17,
+          angle,
+          0,
+          Math.PI * 2,
+        );
+        g.fill();
+      }
+      g.fillStyle = "#000";
+      g.beginPath();
+      g.arc(x, y, r * 0.16, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = "#fff";
+      g.beginPath();
+      g.arc(x, y, r * 0.09, 0, Math.PI * 2);
+      g.fill();
+    };
+    // The lozenge through the edge midpoints, doubled.
+    for (const [inset, width] of [
+      [0, 0.03],
+      [0.07, 0.012],
+    ]) {
+      g.lineWidth = u * width;
+      g.beginPath();
+      g.moveTo(u / 2, u * inset * 1.41);
+      g.lineTo(u - u * inset * 1.41, u / 2);
+      g.lineTo(u / 2, u - u * inset * 1.41);
+      g.lineTo(u * inset * 1.41, u / 2);
+      g.closePath();
+      g.stroke();
+    }
+    // Center medallion.
+    g.fillStyle = "#000";
+    g.beginPath();
+    g.arc(u / 2, u / 2, u * 0.21, 0, Math.PI * 2);
+    g.fill();
+    g.fillStyle = "#fff";
+    ring(u / 2, u / 2, u * 0.2, u * 0.03);
+    ring(u / 2, u / 2, u * 0.235, u * 0.01);
+    rosette(u / 2, u / 2, u * 0.17, 8);
+    // Corner medallions, each a quarter here and whole where four tiles meet.
+    for (const [x, y] of [
+      [0, 0],
+      [u, 0],
+      [0, u],
+      [u, u],
+    ]) {
+      g.fillStyle = "#000";
+      g.beginPath();
+      g.arc(x, y, u * 0.17, 0, Math.PI * 2);
+      g.fill();
+      g.fillStyle = "#fff";
+      ring(x, y, u * 0.16, u * 0.03);
+      ring(x, y, u * 0.195, u * 0.01);
+      rosette(x, y, u * 0.13, 8, Math.PI / 8);
+    }
+    // Beads on the edge midpoints, halved here and whole across the edge.
+    for (const [x, y] of [
+      [u / 2, 0],
+      [u, u / 2],
+      [u / 2, u],
+      [0, u / 2],
+    ]) {
+      g.beginPath();
+      g.arc(x, y, u * 0.045, 0, Math.PI * 2);
+      g.fill();
+    }
+
+    const gold = g.getImageData(0, 0, size, size);
+    const base = marbleCanvas(size, {
+      ink: true,
+      gold: false,
+      bands: 1,
+      warp: 3,
+      seed: 9,
+      fine: 0.1,
+    })
+      .getContext("2d")
+      .getImageData(0, 0, size, size);
+    const color = new ImageData(size, size),
+      metal = new ImageData(size, size);
+    for (let i = 0; i < size * size * 4; i += 4) {
+      const m = gold.data[i] / 255;
+      // Soften the marble so the gold carries the pattern.
+      const r = base.data[i] * 0.45 + 13,
+        gr = base.data[i + 1] * 0.45 + 11,
+        b = base.data[i + 2] * 0.45 + 22;
+      color.data[i] = r * (1 - m) + 240 * m;
+      color.data[i + 1] = gr * (1 - m) + 202 * m;
+      color.data[i + 2] = b * (1 - m) + 122 * m;
+      metal.data[i] = metal.data[i + 1] = metal.data[i + 2] = m * 255;
+      color.data[i + 3] = metal.data[i + 3] = 255;
+    }
+    // The gold stands proud of the marble: its relief becomes a normal map.
+    return {
+      color: toCanvas(color),
+      metal: toCanvas(metal),
+      normals: toCanvas(normalMap(gold, 2.5, 2)),
+    };
+  }
+
+  async function render() {
+    const canvas = document.querySelector(".scene");
+    const { renderer, scene, camera, key, rim } = studio(canvas, { fov: 30 });
+    camera.position.set(0, 11.4, 9.3);
+    camera.lookAt(0, -0.5, 0.15);
+    key.position.set(-5, 6, 3);
+    key.intensity = 1.6;
+    rim.intensity = 1.2;
+    scene.environmentIntensity = 0.7;
+    scene.children.find((child) => child.isHemisphereLight).intensity = 0.35;
+
+    const tile = 1.85,
+      count = 3,
+      depth = 0.4;
+    const pattern = filigree(1024);
+    const surface = (dim, glow) =>
+      new THREE.MeshPhysicalMaterial({
+        map: canvasTexture(pattern.color),
+        metalnessMap: canvasTexture(pattern.metal, { color: false }),
+        normalMap: canvasTexture(pattern.normals, { color: false }),
+        normalScale: new THREE.Vector2(1.4, 1.4),
+        emissiveMap: canvasTexture(pattern.metal),
+        emissive: 0xe0a85a,
+        emissiveIntensity: glow,
+        metalness: 1,
+        roughness: 0.26,
+        clearcoat: 0.7,
+        clearcoatRoughness: 0.12,
+        color: new THREE.Color(dim),
+      });
+    const gold = new THREE.MeshStandardMaterial({
+      color: 0xf5d27e,
+      roughness: 0.24,
+      metalness: 1,
+      envMapIntensity: 1.6,
+    });
+    const ink = new THREE.MeshStandardMaterial({ color: 0x1d1730, roughness: 0.4, metalness: 0.4 });
+    const slab = new THREE.Group();
+    slab.rotation.y = 0.32;
+    scene.add(slab);
+    const body = new THREE.Mesh(new THREE.BoxGeometry(tile * count, depth, tile * count), ink);
+    body.position.y = -depth / 2 - 0.002;
+    slab.add(body);
+
+    // The original tile in full light; the copies around it a step dimmer.
+    const copy = surface(0x968ea4, 0.2),
+      original = surface(0xffffff, 0.85);
+    for (let row = 0; row < count; row++)
+      for (let column = 0; column < count; column++) {
+        const center = row === 1 && column === 1;
+        const face = new THREE.Mesh(new THREE.PlaneGeometry(tile, tile), center ? original : copy);
+        face.rotation.x = -Math.PI / 2;
+        face.position.set((column - 1) * tile, 0, (row - 1) * tile);
+        face.receiveShadow = true;
+        slab.add(face);
+      }
+
+    // Gold edging on the slab, and a fine double gold frame around the original tile.
+    const frame = (side, width, height, y) => {
+      for (const [x, z, w, d] of [
+        [0, -side / 2, side + width, width],
+        [0, side / 2, side + width, width],
+        [-side / 2, 0, width, side + width],
+        [side / 2, 0, width, side + width],
+      ]) {
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(w, height, d), gold);
+        bar.position.set(x, y, z);
+        bar.castShadow = true;
+        slab.add(bar);
+      }
+    };
+    frame(tile * count + 0.07, 0.07, depth + 0.03, -depth / 2);
+    frame(tile, 0.075, 0.12, 0.06);
+    frame(tile + 0.2, 0.03, 0.07, 0.035);
+
+    // A warm pool of light on the original tile and a low light raking across the relief.
+    const spot = new THREE.SpotLight(0xffdcae, 160, 0, 0.17, 0.6, 1.1);
+    spot.position.set(-1.2, 11, 1.2);
+    scene.add(spot, spot.target);
+    const rake = new THREE.DirectionalLight(0xffc98a, 1.4);
+    rake.position.set(-6, 1.2, 2);
+    scene.add(rake);
+
+    renderer.render(scene, camera);
+  }
+  whenReady(render());
+</script>

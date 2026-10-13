@@ -1,0 +1,111 @@
+<div class="stage" data-glow="0.5 0.4">
+  <div class="frame"><img id="source" src="asset:samples/doorway.webp" alt="" /></div>
+  <div class="swatches" id="swatches"></div>
+</div>
+<style>
+  .stage {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6));
+  }
+  .frame {
+    width: 460px;
+    height: 520px;
+    border-radius: 230px 230px 24px 24px;
+    overflow: hidden;
+    outline: 4px solid var(--gold);
+    outline-offset: 12px;
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 12px rgb(23 19 42 / 0.6),
+      0 0 60px 10px rgb(230 192 114 / 0.35);
+  }
+  .frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .swatches {
+    display: flex;
+    gap: 30px;
+    margin-top: -60px;
+  }
+  .swatch {
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 10px rgb(23 19 42 / 0.85),
+      0 0 0 12px rgb(230 192 114 / 0.6),
+      0 0 30px 8px rgb(230 192 114 / 0.3),
+      0 16px 30px rgb(10 6 24 / 0.6);
+  }
+</style>
+<script type="module">
+  // The same k-means extraction the tool runs, on the same sample.
+  async function draw() {
+    const image = document.getElementById("source");
+    await image.decode();
+    const scale = Math.min(1, 160 / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(image.naturalWidth * scale);
+    canvas.height = Math.round(image.naturalHeight * scale);
+    const context = canvas.getContext("2d");
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const bytes = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    const pixels = [];
+    for (let i = 0; i < bytes.length; i += 4)
+      if (bytes[i + 3] > 127) pixels.push([bytes[i], bytes[i + 1], bytes[i + 2]]);
+    const distance = (a, b) => a.reduce((sum, value, i) => sum + (value - b[i]) ** 2, 0);
+    const centers = [pixels[Math.floor(pixels.length / 2)].slice()];
+    while (centers.length < 6) {
+      let farthest = pixels[0];
+      let max = 0;
+      for (const pixel of pixels) {
+        const d = Math.min(...centers.map((center) => distance(pixel, center)));
+        if (d > max) {
+          max = d;
+          farthest = pixel;
+        }
+      }
+      centers.push(farthest.slice());
+    }
+    let counts = [];
+    for (let iteration = 0; iteration < 12; iteration++) {
+      const sums = centers.map(() => [0, 0, 0]);
+      counts = centers.map(() => 0);
+      for (const pixel of pixels) {
+        let nearest = 0;
+        let best = Infinity;
+        centers.forEach((center, index) => {
+          const d = distance(pixel, center);
+          if (d < best) {
+            best = d;
+            nearest = index;
+          }
+        });
+        counts[nearest]++;
+        pixel.forEach((value, channel) => (sums[nearest][channel] += value));
+      }
+      centers.forEach((center, index) => {
+        if (counts[index]) center.forEach((_, c) => (center[c] = sums[index][c] / counts[index]));
+      });
+    }
+    const colors = centers
+      .map((center, index) => ({ center, share: counts[index] }))
+      .filter((color) => color.share > 0)
+      .sort((a, b) => b.share - a.share);
+    const row = document.getElementById("swatches");
+    row.replaceChildren();
+    for (const { center } of colors) {
+      const swatch = document.createElement("div");
+      swatch.className = "swatch";
+      swatch.style.background = `rgb(${center.map(Math.round).join(" ")})`;
+      row.append(swatch);
+    }
+  }
+  if (window.automedia?.registerRenderer) window.automedia.registerRenderer(draw);
+  else draw();
+</script>

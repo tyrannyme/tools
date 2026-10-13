@@ -1,0 +1,134 @@
+<div class="stage" data-glow="0.6 0.42">
+  <div class="print p1"><img src="asset:samples/door.webp" alt="" /></div>
+  <div class="print p2"><img src="asset:samples/portrait.webp" alt="" /></div>
+  <svg class="arrow line glow" viewBox="0 0 1000 640">
+    <path d="M420 280 L460 320 L420 360 M464 280 L504 320 L464 360" />
+  </svg>
+  <div class="doc">
+    <div class="page back"></div>
+    <div class="page back"></div>
+    <div class="page">
+      <div class="margin"></div>
+      <img src="asset:samples/doorway.webp" alt="" />
+      <svg class="marks" viewBox="0 0 360 510">
+        <path
+          d="M10 36 H26 M36 10 V26 M350 36 H334 M324 10 V26 M10 474 H26 M36 500 V484 M350 474 H334 M324 500 V484"
+        />
+      </svg>
+    </div>
+  </div>
+</div>
+<style>
+  .stage {
+    position: relative;
+    width: 1000px;
+    height: 640px;
+    transform: translate(-10px, -6px) scale(1.06);
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6));
+  }
+  .doc {
+    position: absolute;
+    left: 560px;
+    top: 80px;
+    width: 360px;
+    height: 510px;
+    filter: drop-shadow(0 0 40px rgb(230 192 114 / 0.35));
+  }
+  .page {
+    --fold: 56px;
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: linear-gradient(170deg, #fbf3e6, #e6d9c8);
+    box-shadow: inset 0 0 0 2px rgb(169 124 52 / 0.55);
+    clip-path: polygon(0 0, calc(100% - var(--fold)) 0, 100% var(--fold), 100% 100%, 0 100%);
+  }
+  .page::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--fold);
+    height: var(--fold);
+    border-bottom-left-radius: 6px;
+    background: linear-gradient(
+      225deg,
+      transparent 50%,
+      var(--gold-deep) 50%,
+      var(--gold) 80%,
+      var(--gold-light)
+    );
+  }
+  .back:nth-child(1) {
+    transform: translate(32px, -28px);
+    filter: brightness(0.8);
+  }
+  .back:nth-child(2) {
+    transform: translate(16px, -14px);
+    filter: brightness(0.9);
+  }
+  .margin {
+    position: absolute;
+    inset: 36px;
+    border: 2px dashed rgb(169 124 52 / 0.65);
+    border-radius: 2px;
+  }
+  .page img {
+    position: absolute;
+    left: 36px;
+    top: 103px;
+    width: 288px;
+    height: 288px;
+    object-fit: cover;
+    border-radius: 2px;
+    box-shadow: 0 6px 18px rgb(23 19 42 / 0.3);
+  }
+  .marks {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--gold-deep);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .print {
+    position: absolute;
+    width: 230px;
+    height: 270px;
+    padding: 13px 13px 48px;
+    border-radius: 6px;
+    background: linear-gradient(170deg, #fbf3e6, #e6d9c8);
+    box-shadow:
+      inset 0 0 0 2px rgb(169 124 52 / 0.45),
+      0 18px 40px rgb(10 6 24 / 0.55);
+  }
+  .print img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 2px;
+  }
+  .p1 {
+    left: 90px;
+    top: 150px;
+    transform: rotate(-14deg);
+  }
+  .p1 img {
+    object-fit: contain;
+    background: linear-gradient(180deg, #3e3468, #b98aa8);
+  }
+  .p2 {
+    left: 170px;
+    top: 210px;
+    transform: rotate(6deg);
+  }
+  .arrow {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>

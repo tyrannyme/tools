@@ -1,0 +1,171 @@
+<div class="stage" data-glow="0.5 0.6">
+  <svg viewBox="0 0 1000 620" width="930" height="577">
+    <defs>
+      <linearGradient id="metal" x1="0" y1="0" x2="0.3" y2="1">
+        <stop offset="0" stop-color="#f8e6b8" />
+        <stop offset="0.5" stop-color="#e6c072" />
+        <stop offset="1" stop-color="#a97c34" />
+      </linearGradient>
+      <radialGradient id="sheen" cx="500" cy="560" r="480" gradientUnits="userSpaceOnUse">
+        <stop offset="0.3" stop-color="#17132a" stop-opacity="0.35" />
+        <stop offset="0.6" stop-color="#17132a" stop-opacity="0" />
+        <stop offset="1" stop-color="#fff4e0" stop-opacity="0.18" />
+      </radialGradient>
+    </defs>
+    <g class="sticks"></g>
+    <g class="leaf"></g>
+    <g class="trim"></g>
+    <g class="pivot">
+      <circle cx="500" cy="560" r="30" fill="url(#metal)" />
+      <circle cx="500" cy="560" r="30" class="edge" />
+      <path class="gem" d="M500 540 l14 20 l-14 20 l-14 -20 Z" />
+    </g>
+  </svg>
+</div>
+<style>
+  .stage {
+    position: relative;
+    margin-top: -20px;
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6))
+      drop-shadow(0 0 40px rgb(230 192 114 / 0.25));
+  }
+  svg {
+    display: block;
+    overflow: visible;
+  }
+  .sticks path {
+    fill: none;
+    stroke: url(#metal);
+    stroke-width: 9;
+    stroke-linecap: round;
+  }
+  .leaf path {
+    stroke: rgb(23 19 42 / 0.25);
+    stroke-width: 1;
+  }
+  .trim .rib {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .trim .band {
+    fill: none;
+    stroke: var(--gold);
+    stroke-width: 5;
+  }
+  .trim .hair {
+    fill: none;
+    stroke: var(--gold-light);
+    stroke-width: 2;
+  }
+  .trim .guard {
+    fill: url(#metal);
+    stroke: var(--gold-deep);
+    stroke-width: 1.5;
+  }
+  .trim .bead {
+    fill: var(--gold-light);
+  }
+  .trim {
+    filter: drop-shadow(0 0 8px rgb(230 192 114 / 0.5));
+  }
+  .edge {
+    fill: none;
+    stroke: #17132a;
+    stroke-width: 3;
+  }
+  .gem {
+    fill: #fff6dc;
+    filter: drop-shadow(0 0 8px rgb(248 230 184 / 0.9));
+  }
+</style>
+<script type="module">
+  // A folding fan whose pleats run round the colour wheel.
+  const ns = "http://www.w3.org/2000/svg";
+  const make = (parent, name, attrs) => {
+    const node = document.createElementNS(ns, name);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    document.querySelector(parent).append(node);
+    return node;
+  };
+  const cx = 500;
+  const cy = 560;
+  const inner = 190;
+  const outer = 480;
+  const pleats = 16;
+  const spread = 164;
+  const angle = (i) => ((-spread / 2 + (i / pleats) * spread) * Math.PI) / 180;
+  const at = (r, a) => `${(cx + r * Math.sin(a)).toFixed(1)} ${(cy - r * Math.cos(a)).toFixed(1)}`;
+
+  for (let i = 0; i < pleats; i++) {
+    const a0 = angle(i);
+    const a1 = angle(i + 1);
+    const am = (a0 + a1) / 2;
+    const hue = (300 - (i / pleats) * 330 + 360) % 360;
+    // Each pleat folds into a lit face and a shaded face.
+    make(".leaf", "path", {
+      d: `M${at(inner, a0)} L${at(outer, a0)} L${at(outer - 10, am)} L${at(inner, am)} Z`,
+      fill: `oklch(0.76 0.12 ${hue})`,
+    });
+    make(".leaf", "path", {
+      d: `M${at(inner, am)} L${at(outer - 10, am)} L${at(outer, a1)} L${at(inner, a1)} Z`,
+      fill: `oklch(0.56 0.12 ${hue})`,
+    });
+  }
+  // Gold sticks below the leaf and ribs across it.
+  for (let i = 1; i < pleats; i++) {
+    make(".sticks", "path", { d: `M${at(30, angle(i))} L${at(inner + 6, angle(i))}` });
+    make(".trim", "path", { class: "rib", d: `M${at(inner, angle(i))} L${at(outer, angle(i))}` });
+  }
+  // Gold borders: the folded outer edge, a double band through the leaf, and the inner edge.
+  const zigzag = [];
+  for (let i = 0; i <= pleats; i++) {
+    zigzag.push(at(outer, angle(i)));
+    if (i < pleats) zigzag.push(at(outer - 10, (angle(i) + angle(i + 1)) / 2));
+  }
+  make(".trim", "path", { class: "band", d: `M${zigzag.join(" L")}` });
+  // A sheen across the leaf, inside its folded edge.
+  make(".leaf", "path", {
+    d: `M${at(inner, angle(0))} L${zigzag.join(" L")} L${at(inner, angle(pleats))} A${inner} ${inner} 0 0 0 ${at(inner, angle(0))} Z`,
+    fill: "url(#sheen)",
+    stroke: "none",
+  });
+  for (const [r, cls] of [
+    [outer - 26, "hair"],
+    [inner + 34, "hair"],
+    [inner, "band"],
+  ]) {
+    make(".trim", "path", {
+      class: cls,
+      d: `M${at(r, angle(0))} A${r} ${r} 0 0 1 ${at(r, angle(pleats))}`,
+    });
+  }
+  // Beads where the ribs cross the bands.
+  for (let i = 1; i < pleats; i++) {
+    make(".trim", "circle", {
+      class: "bead",
+      cx: cx + (outer - 26) * Math.sin(angle(i)),
+      cy: cy - (outer - 26) * Math.cos(angle(i)),
+      r: 5,
+    });
+  }
+  // The two guard sticks, heavier, tapering to a point past the leaf.
+  for (const i of [0, pleats]) {
+    const a = angle(i);
+    const dx = Math.sin(a);
+    const dy = -Math.cos(a);
+    const point = (r, w) =>
+      `${(cx + r * dx - w * dy).toFixed(1)} ${(cy + r * dy + w * dx).toFixed(1)}`;
+    make(".trim", "path", {
+      class: "guard",
+      d: `M${point(20, -8)} L${point(outer + 4, -12)} L${point(outer + 44, 0)} L${point(outer + 4, 12)} L${point(20, 8)} Z`,
+    });
+    make(".trim", "circle", {
+      class: "bead",
+      cx: cx + (outer - 26) * dx,
+      cy: cy + (outer - 26) * dy,
+      r: 6,
+    });
+  }
+</script>

@@ -2,6 +2,10 @@ allowBuilds:
   # The site only uses vgpu in the browser; skip the headless Node GPU backend.
   "@vgpu/adapter-node": false
   esbuild: true
+  # AI tools run in the browser; skip transformers.js native Node backends.
+  onnxruntime-node: false
+  protobufjs: false
+  sharp: false
   webgpu: false
   workerd: true
 minimumReleaseAgeExclude:

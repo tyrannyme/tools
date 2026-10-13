@@ -1,0 +1,111 @@
+<div class="scene" data-glow="0.5 0.48">
+  <div class="ghost"><div class="ghost-image"></div></div>
+  <svg class="ornament line" viewBox="0 0 1280 800"></svg>
+  <div class="film">
+    <div class="holes"></div>
+    <div class="shot"></div>
+    <div class="holes"></div>
+  </div>
+</div>
+<style>
+  .scene {
+    position: relative;
+    width: 1280px;
+    height: 800px;
+  }
+  .ghost {
+    position: absolute;
+    inset: 80px 150px;
+    border-radius: 26px;
+    overflow: hidden;
+    background: rgb(23 19 42 / 0.4);
+  }
+  .ghost-image {
+    position: absolute;
+    inset: 0;
+    background: url("asset:samples/portrait.webp") 50% 22% / cover;
+    opacity: 0.3;
+    filter: blur(3px) saturate(0.7);
+  }
+  .ornament {
+    position: absolute;
+    inset: 0;
+  }
+  .ornament .edge {
+    stroke-width: 2.5;
+    stroke-dasharray: 14 12;
+    opacity: 0.7;
+  }
+  .ornament .corner {
+    stroke-width: 5;
+    filter: var(--glow);
+  }
+  .ornament .chevron {
+    stroke-width: 8.5;
+    filter: var(--glow);
+  }
+  .film {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 560px;
+    height: 372px;
+    margin: -186px 0 0 -280px;
+    display: grid;
+    grid-template-rows: 46px 1fr 46px;
+    border-radius: 18px;
+    padding: 0 16px;
+    background: #0f0c1d;
+    box-shadow:
+      inset 0 0 0 3px var(--gold),
+      inset 0 0 0 9px #0f0c1d,
+      inset 0 0 0 11px rgb(230 192 114 / 0.5),
+      0 0 60px 10px rgb(230 192 114 / 0.32),
+      0 40px 70px rgb(10 6 24 / 0.65);
+  }
+  .holes {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+  }
+  .holes i {
+    width: 22px;
+    height: 20px;
+    border-radius: 5px;
+    box-shadow: inset 0 0 0 2px rgb(230 192 114 / 0.8);
+  }
+  .shot {
+    border-radius: 8px;
+    background: url("asset:samples/portrait.webp") 50% 22% / cover;
+    box-shadow: inset 0 0 0 2px rgb(230 192 114 / 0.6);
+  }
+</style>
+<script type="module">
+  for (const row of document.querySelectorAll(".holes")) row.innerHTML = "<i></i>".repeat(11);
+
+  // The old size as a dashed outline with bright corners, and chevrons pressing it down to the new.
+  const svg = document.querySelector(".ornament");
+  const outer = { x: 150, y: 80, w: 980, h: 640 };
+  const inner = { x: 360, y: 214, w: 560, h: 372 };
+  let markup = `<rect class="edge" x="${outer.x}" y="${outer.y}" width="${outer.w}" height="${outer.h}" rx="26" />`;
+  for (const [sx, sy] of [
+    [1, 1],
+    [-1, 1],
+    [1, -1],
+    [-1, -1],
+  ]) {
+    const ox = sx > 0 ? outer.x : outer.x + outer.w;
+    const oy = sy > 0 ? outer.y : outer.y + outer.h;
+    const ix = sx > 0 ? inner.x : inner.x + inner.w;
+    const iy = sy > 0 ? inner.y : inner.y + inner.h;
+    markup += `<path class="corner" d="M${ox} ${oy + sy * 70} V${oy + sy * 26} Q${ox} ${oy} ${ox + sx * 26} ${oy} H${ox + sx * 70}" />`;
+    const angle = (Math.atan2(iy - oy, ix - ox) * 180) / Math.PI;
+    [0.3, 0.47, 0.64].forEach((t, i) => {
+      const x = ox + (ix - ox) * t;
+      const y = oy + (iy - oy) * t;
+      markup += `<path class="chevron" opacity="${0.45 + i * 0.27}" transform="translate(${x} ${y}) rotate(${angle})" d="M-16 -27 L11 0 L-16 27" />`;
+    });
+  }
+  svg.innerHTML = markup;
+</script>

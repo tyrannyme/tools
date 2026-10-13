@@ -1,0 +1,238 @@
+<div class="stage" data-glow="0.5 0.42">
+  <div class="scroll">
+    <div class="roll top"></div>
+    <div class="sheet">
+      <div class="initial">T</div>
+      <div class="lines">
+        <p><i style="width: 110px"></i><i style="width: 110px"></i><i style="width: 110px"></i></p>
+        <p>
+          <i style="width: 58px"></i><i style="width: 110px"></i><i style="width: 58px"></i
+          ><i style="width: 48px"></i>
+        </p>
+        <p>
+          <i style="width: 90px"></i><i style="width: 58px"></i><i style="width: 48px"></i
+          ><i style="width: 34px"></i><i style="width: 64px"></i>
+        </p>
+        <p>
+          <i style="width: 58px"></i><i style="width: 34px"></i><i style="width: 48px"></i
+          ><i style="width: 34px"></i><i style="width: 34px"></i><i style="width: 72px"></i>
+        </p>
+        <p>
+          <i style="width: 34px"></i><i style="width: 110px"></i><i style="width: 40px"></i
+          ><i style="width: 110px"></i><i style="width: 72px"></i>
+        </p>
+        <p>
+          <i style="width: 90px"></i><i style="width: 110px"></i><i style="width: 34px"></i
+          ><i style="width: 48px"></i><i style="width: 110px"></i>
+        </p>
+        <p>
+          <i style="width: 64px"></i><i style="width: 48px"></i><i style="width: 90px"></i
+          ><i style="width: 40px"></i><i style="width: 72px"></i><i style="width: 90px"></i>
+        </p>
+        <p>
+          <i style="width: 48px"></i><i style="width: 48px"></i><i style="width: 64px"></i
+          ><i style="width: 48px"></i><i style="width: 90px"></i><i style="width: 64px"></i
+          ><i style="width: 48px"></i>
+        </p>
+        <p>
+          <i style="width: 34px"></i><i style="width: 72px"></i><i style="width: 72px"></i
+          ><i style="width: 34px"></i><i style="width: 110px"></i><i style="width: 64px"></i>
+        </p>
+        <p>
+          <i style="width: 64px"></i><i style="width: 48px"></i><i style="width: 72px"></i
+          ><i style="width: 90px"></i><i style="width: 40px"></i><i style="width: 48px"></i>
+        </p>
+        <p>
+          <i style="width: 40px"></i><i style="width: 34px"></i><i style="width: 64px"></i
+          ><i style="width: 48px"></i><i style="width: 58px"></i><i style="width: 72px"></i
+          ><i style="width: 48px"></i>
+        </p>
+        <p><i style="width: 34px"></i><i style="width: 110px"></i></p>
+      </div>
+    </div>
+    <div class="roll bottom"></div>
+  </div>
+  <div class="medal">
+    <i class="gem n"></i><i class="gem s"></i><i class="gem e"></i><i class="gem w"></i>
+    <div class="count">62</div>
+  </div>
+</div>
+<style>
+  .stage {
+    position: relative;
+    width: 980px;
+    height: 640px;
+    transform: translateX(-18px);
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6));
+  }
+  .scroll {
+    position: absolute;
+    left: 120px;
+    top: 30px;
+    width: 600px;
+    height: 580px;
+  }
+  .sheet {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    top: 30px;
+    bottom: 30px;
+    padding: 50px 46px;
+    background:
+      linear-gradient(
+        90deg,
+        rgb(120 90 50 / 0.12),
+        transparent 8%,
+        transparent 92%,
+        rgb(120 90 50 / 0.12)
+      ),
+      linear-gradient(175deg, #fbf3e6, #eadcc6);
+    box-shadow: inset 0 0 0 2px rgb(169 124 52 / 0.4);
+  }
+  .sheet::before {
+    content: "";
+    position: absolute;
+    inset: 18px 16px;
+    border: 2px solid rgb(169 124 52 / 0.75);
+    outline: 1px solid rgb(169 124 52 / 0.5);
+    outline-offset: 4px;
+  }
+  .roll {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 60px;
+    border-radius: 30px;
+    background:
+      linear-gradient(
+        90deg,
+        var(--gold-deep) 0 6px,
+        var(--gold) 6px 12px,
+        transparent 12px calc(100% - 12px),
+        var(--gold) calc(100% - 12px) calc(100% - 6px),
+        var(--gold-deep) calc(100% - 6px)
+      ),
+      linear-gradient(180deg, #fffaf0, #eadcc4 35%, #c2a985 75%, #8a7152);
+    box-shadow: 0 10px 20px rgb(10 6 24 / 0.4);
+  }
+  .roll::before,
+  .roll::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    width: 40px;
+    height: 56px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 30%, #fff3d0, var(--gold) 50%, var(--gold-deep));
+    box-shadow:
+      inset 0 0 0 3px rgb(169 124 52 / 0.8),
+      0 0 24px rgb(230 192 114 / 0.65);
+  }
+  .roll::before {
+    left: -32px;
+  }
+  .roll::after {
+    right: -32px;
+  }
+  .top {
+    top: 0;
+  }
+  .bottom {
+    bottom: 0;
+  }
+  .initial {
+    float: left;
+    width: 118px;
+    height: 118px;
+    margin: 0 22px 8px 0;
+    display: grid;
+    place-items: center;
+    border-radius: 6px;
+    background: var(--ink);
+    box-shadow:
+      inset 0 0 0 3px var(--gold),
+      inset 0 0 0 9px var(--ink),
+      inset 0 0 0 10px rgb(230 192 114 / 0.6);
+    font: 600 104px/1 var(--serif);
+    color: var(--gold);
+    text-shadow: 0 0 18px rgb(230 192 114 / 0.6);
+    padding-top: 6px;
+  }
+  .lines p {
+    display: flex;
+    gap: 18px;
+    margin: 0 0 22px;
+    height: 12px;
+  }
+  .lines i {
+    border-radius: 6px;
+    background: rgb(23 19 42 / 0.3);
+  }
+  .medal {
+    position: absolute;
+    left: 610px;
+    top: 250px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(circle at 40% 30%, #3a3062, var(--ink) 70%);
+    box-shadow:
+      0 0 0 6px var(--gold),
+      0 0 0 12px rgb(23 19 42 / 0.7),
+      0 0 0 15px var(--gold-deep),
+      0 0 70px 14px rgb(230 192 114 / 0.4);
+  }
+  .medal::before,
+  .medal::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    border: 4px solid var(--gold);
+  }
+  .medal::before {
+    inset: 12px;
+  }
+  .medal::after {
+    inset: 24px;
+    border-width: 2px;
+    border-color: rgb(230 192 114 / 0.7);
+  }
+  .gem {
+    position: absolute;
+    z-index: 1;
+    width: 22px;
+    height: 22px;
+    margin: -11px 0 0 -11px;
+    background: var(--gold);
+    border: 3px solid var(--ink);
+    transform: rotate(45deg);
+  }
+  .gem.n {
+    left: 50%;
+    top: 12px;
+  }
+  .gem.s {
+    left: 50%;
+    top: 288px;
+  }
+  .gem.e {
+    left: 288px;
+    top: 50%;
+  }
+  .gem.w {
+    left: 12px;
+    top: 50%;
+  }
+  .count {
+    font: 600 132px/1 var(--serif);
+    color: var(--gold-light);
+    letter-spacing: -2px;
+    text-shadow:
+      0 0 24px rgb(230 192 114 / 0.7),
+      0 2px 0 var(--gold-deep);
+    margin-top: -8px;
+  }
+</style>

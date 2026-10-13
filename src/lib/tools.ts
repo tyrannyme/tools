@@ -1,4 +1,4 @@
-import { Box, Braces, Clapperboard, FileText, Gamepad2, Image } from "lucide-react";
+import { Box, Braces, Clapperboard, FileText, Gamepad2, Image, Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { ComponentType } from "react";
 
@@ -25,6 +25,12 @@ export interface Category {
 }
 
 export const categories: Category[] = [
+  {
+    slug: "ai",
+    name: "AI",
+    description: "AI that runs on your device. Models download once, then work offline.",
+    icon: Sparkles,
+  },
   {
     slug: "images",
     name: "Images",

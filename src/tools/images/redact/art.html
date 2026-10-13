@@ -1,0 +1,116 @@
+<div class="stage" data-glow="0.5 0.45">
+  <div class="frame"><canvas id="shot" width="640" height="600"></canvas></div>
+  <img id="face" src="asset:samples/portrait.webp" alt="" hidden />
+  <img id="isle" src="asset:samples/door.webp" alt="" hidden />
+</div>
+<style>
+  .stage {
+    filter: drop-shadow(0 40px 60px rgb(10 6 24 / 0.6));
+    transform: rotate(-1.5deg);
+  }
+  .frame {
+    border-radius: 22px;
+    overflow: hidden;
+    outline: 4px solid var(--gold);
+    outline-offset: 12px;
+    box-shadow:
+      0 0 0 4px var(--gold),
+      0 0 0 12px rgb(23 19 42 / 0.6),
+      0 0 60px 10px rgb(230 192 114 / 0.35);
+  }
+  canvas {
+    display: block;
+    width: 640px;
+    height: 600px;
+  }
+</style>
+<script type="module">
+  async function draw() {
+    const face = document.getElementById("face");
+    const isle = document.getElementById("isle");
+    await Promise.all([face.decode(), isle.decode()]);
+    const canvas = document.getElementById("shot");
+    const ctx = canvas.getContext("2d");
+    const { width, height } = canvas;
+    const panel = ctx.createLinearGradient(0, 0, width * 0.4, height);
+    panel.addColorStop(0, "#2e2552");
+    panel.addColorStop(1, "#161229");
+    ctx.fillStyle = panel;
+    ctx.fillRect(0, 0, width, height);
+    const warmth = ctx.createRadialGradient(width * 0.8, height, 0, width * 0.8, height, width);
+    warmth.addColorStop(0, "rgb(240 180 138 / 0.16)");
+    warmth.addColorStop(1, "rgb(240 180 138 / 0)");
+    ctx.fillStyle = warmth;
+    ctx.fillRect(0, 0, width, height);
+
+    // A post: avatar, name, handle, a photo, and a line of text.
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(36, 32, 128, 128, 22);
+    ctx.clip();
+    ctx.drawImage(face, 200, 110, 540, 540, 36, 32, 128, 128);
+    ctx.restore();
+    const bar = (x, y, w, h, color) => {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.roundRect(x, y, w, h, h / 2);
+      ctx.fill();
+    };
+    const soft = "rgb(255 244 236 / 0.2)";
+    bar(194, 66, 300, 34, "rgb(255 244 236 / 0.8)");
+    bar(194, 116, 170, 22, soft);
+
+    const photo = { x: 36, y: 186, w: 568, h: 300 };
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(photo.x, photo.y, photo.w, photo.h, 14);
+    ctx.clip();
+    const sky = ctx.createLinearGradient(0, photo.y, 0, photo.y + photo.h);
+    sky.addColorStop(0, "#3b2d63");
+    sky.addColorStop(0.6, "#9a6d9c");
+    sky.addColorStop(1, "#f0b48a");
+    ctx.fillStyle = sky;
+    ctx.fillRect(photo.x, photo.y, photo.w, photo.h);
+    ctx.drawImage(isle, photo.x + photo.w / 2 - 125, photo.y + 6, 250, 333);
+    ctx.restore();
+
+    bar(36, 514, 568, 24, soft);
+    bar(36, 556, 360, 24, soft);
+
+    // The redactions, done the way the tool does them.
+    const pixelate = (x, y, w, h, block) => {
+      const small = document.createElement("canvas");
+      small.width = Math.ceil(w / block);
+      small.height = Math.ceil(h / block);
+      small.getContext("2d").drawImage(canvas, x, y, w, h, 0, 0, small.width, small.height);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(small, 0, 0, small.width, small.height, x, y, w, h);
+      ctx.imageSmoothingEnabled = true;
+    };
+    pixelate(36, 32, 128, 128, 128 / 6);
+    // Solid ink, edged in gold so the boxes still read at card size.
+    const redact = (x, y, w, h) => {
+      ctx.save();
+      ctx.shadowColor = "rgb(230 192 114 / 0.55)";
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = "#06040c";
+      ctx.fillRect(x, y, w, h);
+      ctx.shadowBlur = 8;
+      ctx.strokeStyle = "rgb(230 192 114 / 0.8)";
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(x + 1.25, y + 1.25, w - 2.5, h - 2.5);
+      ctx.restore();
+    };
+    redact(184, 54, 324, 58);
+    redact(220, 504, 300, 44);
+    ctx.save();
+    ctx.shadowColor = "rgb(230 192 114 / 0.55)";
+    ctx.shadowBlur = 8;
+    ctx.strokeStyle = "rgb(230 192 114 / 0.8)";
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(37.25, 33.25, 125.5, 125.5);
+    ctx.restore();
+  }
+  if (window.automedia?.registerRenderer) window.automedia.registerRenderer(draw);
+  else draw();
+</script>

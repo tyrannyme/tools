@@ -1,0 +1,129 @@
+<div class="stage" data-glow="0.42 0.5">
+  <canvas class="solid" width="2560" height="1600"></canvas>
+  <div class="lens">
+    <canvas class="wire" width="2560" height="1600"></canvas>
+  </div>
+  <div class="glass"></div>
+  <svg class="loupe glow" viewBox="0 0 1280 800">
+    <path class="handle" d="M893 393 L1012 512" />
+    <path class="grip" d="M935 435 L1012 512" />
+    <path class="collar" d="M880 380 L906 406" />
+    <circle cx="770" cy="270" r="160" class="rim" />
+    <circle cx="770" cy="270" r="174" class="line" />
+    <circle cx="770" cy="270" r="146" class="line thin" />
+  </svg>
+</div>
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+  }
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 1280px;
+    height: 800px;
+  }
+  .solid {
+    filter: drop-shadow(0 40px 50px rgb(10 6 24 / 0.55));
+  }
+  .lens {
+    position: absolute;
+    inset: 0;
+    clip-path: circle(154px at 770px 270px);
+    background: radial-gradient(
+      circle at 770px 270px,
+      rgb(36 28 62 / 0.96),
+      rgb(16 12 30 / 0.98) 154px
+    );
+  }
+  .wire {
+    transform-origin: 770px 270px;
+    transform: none;
+  }
+  .loupe {
+    position: absolute;
+    inset: 0;
+    width: 1280px;
+    height: 800px;
+  }
+  .loupe .rim {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 22;
+  }
+  .loupe .thin {
+    stroke-width: 3;
+  }
+  .loupe .handle {
+    stroke: var(--gold);
+    stroke-width: 36;
+    stroke-linecap: round;
+  }
+  .loupe .grip {
+    stroke: var(--ink);
+    stroke-width: 20;
+    stroke-linecap: round;
+  }
+  .loupe .collar {
+    stroke: var(--gold-light);
+    stroke-width: 50;
+  }
+  .glass {
+    position: absolute;
+    inset: 0;
+    clip-path: circle(154px at 770px 270px);
+    background: radial-gradient(circle at 700px 190px, rgb(255 255 255 / 0.16), transparent 120px);
+  }
+</style>
+<script type="module">
+  import { THREE, studio, sculpture, whenReady } from "asset:art/3d-kit.js";
+
+  async function render() {
+    const solid = document.querySelector(".solid");
+    const { renderer, scene, camera } = studio(solid);
+    camera.position.set(0, 2.3, 7.4);
+    camera.lookAt(0, 1.42, 0);
+
+    const model = sculpture();
+    model.rotation.y = -0.35;
+    scene.add(model);
+    renderer.render(scene, camera);
+
+    // The inspection view: the same mesh in gold wire over ink, hidden lines removed, with
+    // the lines thickened so they survive at card size.
+    const wire = document.querySelector(".wire").getContext("2d");
+    const fill = new THREE.MeshStandardMaterial({
+      color: 0x2a2148,
+      roughness: 0.55,
+      metalness: 0.3,
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1,
+    });
+    const lines = new THREE.LineBasicMaterial({ color: 0xffe2a0 });
+    const inspected = sculpture({ marble: fill, gold: fill, ink: fill }, 0.5);
+    inspected.rotation.y = model.rotation.y;
+    scene.remove(model);
+    scene.add(inspected);
+    renderer.render(scene, camera);
+    wire.drawImage(solid, 0, 0);
+    fill.colorWrite = false;
+    inspected.traverse((node) => {
+      if (node.isMesh)
+        node.add(new THREE.LineSegments(new THREE.WireframeGeometry(node.geometry), lines));
+    });
+    renderer.render(scene, camera);
+    for (const [x, y] of [
+      [0, 0],
+      [1, 0],
+      [0, 1],
+      [1, 1],
+    ])
+      wire.drawImage(solid, x, y);
+    scene.remove(inspected);
+    scene.add(model);
+    renderer.render(scene, camera);
+  }
+  whenReady(render());
+</script>

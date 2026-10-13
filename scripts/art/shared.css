@@ -1,0 +1,87 @@
+/*
+ * Shared look for the tool card artwork. Every artwork is a 1280x800 still over its own dusk sky
+ * (set by scripts/thumbs.mjs). One clear subject, centered, drawn in gold and light; no words.
+ */
+@font-face {
+  font-family: "Cormorant";
+  src: url("fonts/cormorant-garamond-600.ttf");
+  font-weight: 600;
+}
+@font-face {
+  font-family: "Noto Sans";
+  src: url("fonts/noto-sans-400.ttf");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Noto Sans";
+  src: url("fonts/noto-sans-600.ttf");
+  font-weight: 600;
+}
+
+:root {
+  --gold: #e6c072;
+  --gold-light: #f8e6b8;
+  --gold-deep: #a97c34;
+  --ink: #17132a;
+  --ink-soft: rgb(23 19 42 / 0.55);
+  --mist: rgb(255 244 236 / 0.9);
+  --glow: drop-shadow(0 0 18px rgb(230 192 114 / 0.55)) drop-shadow(0 0 3px rgb(248 230 184 / 0.8));
+  --shadow: 0 30px 80px rgb(10 6 24 / 0.55), 0 8px 24px rgb(10 6 24 / 0.35);
+  --serif: "Cormorant", Georgia, serif;
+  --sans: "Noto Sans", system-ui, sans-serif;
+  --mono: ui-monospace, "DejaVu Sans Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 1280px;
+  height: 800px;
+  overflow: hidden;
+}
+
+body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: center / cover no-repeat;
+  color: var(--mist);
+  font-family: var(--sans);
+}
+
+/* Gold line art: put on an <svg> or a group inside one. */
+.line {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Gold that glows. */
+.glow {
+  filter: var(--glow);
+}
+
+/* A dark glass card with a gold hairline, for panels, documents, and screens. */
+.panel {
+  border-radius: 28px;
+  background: linear-gradient(160deg, rgb(40 32 70 / 0.72), rgb(18 14 34 / 0.82));
+  box-shadow:
+    inset 0 0 0 2px rgb(230 192 114 / 0.55),
+    inset 0 1px 0 4px rgb(255 255 255 / 0.04),
+    var(--shadow);
+  backdrop-filter: blur(6px);
+}
+
+/* A lit page, for paper and documents. */
+.paper {
+  border-radius: 14px;
+  background: linear-gradient(170deg, #fbf3e6, #eadcc8);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}

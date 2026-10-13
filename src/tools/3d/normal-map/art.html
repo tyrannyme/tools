@@ -1,0 +1,143 @@
+<div class="stage" data-glow="0.3 0.45">
+  <canvas class="scene" width="2560" height="1600"></canvas>
+</div>
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+  }
+  .scene {
+    position: absolute;
+    inset: 0;
+    width: 1280px;
+    height: 800px;
+    filter: drop-shadow(0 40px 50px rgb(10 6 24 / 0.6));
+  }
+</style>
+<script type="module">
+  import {
+    THREE,
+    studio,
+    stoneTexture,
+    normalMap,
+    toCanvas,
+    canvasTexture,
+    whenReady,
+  } from "asset:art/3d-kit.js";
+
+  async function render() {
+    const canvas = document.querySelector(".scene");
+    const { renderer, scene, camera, key, rim } = studio(canvas, { fov: 30 });
+    renderer.localClippingEnabled = true;
+    camera.position.set(0, 0.2, 15.2);
+    camera.lookAt(0, 0.05, 0);
+    // Raking gold light from the left so the relief throws long highlights and shadows.
+    key.position.set(-9, 3.2, 1.1);
+    key.intensity = 7.5;
+    key.color.set(0xffd49a);
+    rim.position.set(7, -3, 3);
+    rim.intensity = 1.4;
+    rim.color.set(0xb9a2ff);
+    scene.children.find((child) => child.isHemisphereLight).intensity = 0.2;
+    scene.environmentIntensity = 0.3;
+
+    const stone = stoneTexture({ size: 1024 });
+    const normals = normalMap(stone, 4, 4);
+    const w = 4.3,
+      h = 5.4,
+      depth = 0.3,
+      top = h / 2 - w / 2;
+    const arch = (inset) => {
+      const shape = new THREE.Shape();
+      const x = w / 2 - inset,
+        y = h / 2 - inset;
+      shape.moveTo(-x, -y);
+      shape.lineTo(x, -y);
+      shape.lineTo(x, top);
+      shape.absarc(0, top, x, 0, Math.PI, false);
+      shape.lineTo(-x, -y);
+      return shape;
+    };
+    const ring = (outer, inner, z, thickness, material) => {
+      const shape = arch(outer);
+      shape.holes.push(arch(inner));
+      const mesh = new THREE.Mesh(
+        new THREE.ExtrudeGeometry(shape, {
+          depth: thickness,
+          bevelEnabled: false,
+          curveSegments: 64,
+        }),
+        material,
+      );
+      mesh.position.z = z;
+      return mesh;
+    };
+    const panel = new THREE.Group();
+    panel.rotation.set(-0.06, 0.38, 0.0);
+    scene.add(panel);
+    panel.updateMatrixWorld(true);
+
+    // The seam runs corner to corner: the flat normal map above it, the lit relief below.
+    const across = new THREE.Vector3(-1, 1, 0).normalize().transformDirection(panel.matrixWorld);
+    const flatSide = new THREE.Plane().setFromNormalAndCoplanarPoint(across, new THREE.Vector3());
+    const litSide = flatSide.clone().negate();
+    const fit = (texture) => {
+      texture.repeat.set(1 / h, 1 / h);
+      texture.offset.set(0.5, 0.5);
+      return texture;
+    };
+    const face = new THREE.ShapeGeometry(arch(0), 64);
+    const flat = new THREE.Mesh(
+      face,
+      new THREE.MeshBasicMaterial({
+        map: fit(canvasTexture(toCanvas(normals), { color: false })),
+        toneMapped: false,
+        clippingPlanes: [flatSide],
+      }),
+    );
+    const lit = new THREE.Mesh(
+      face,
+      new THREE.MeshStandardMaterial({
+        map: fit(canvasTexture(toCanvas(stone))),
+        normalMap: fit(canvasTexture(toCanvas(normals), { color: false })),
+        normalScale: new THREE.Vector2(2.2, 2.2),
+        color: 0xe6e2f2,
+        roughness: 0.7,
+        clippingPlanes: [litSide],
+      }),
+    );
+    flat.position.z = lit.position.z = depth / 2 + 0.002;
+    panel.add(flat, lit);
+
+    const gold = new THREE.MeshStandardMaterial({ color: 0xf0c56e, roughness: 0.2, metalness: 1 });
+    gold.envMapIntensity = 3;
+    const ink = new THREE.MeshStandardMaterial({ color: 0x1d1730, roughness: 0.5, metalness: 0.3 });
+    const back = new THREE.Mesh(
+      new THREE.ExtrudeGeometry(arch(-0.32), { depth, bevelEnabled: false, curveSegments: 64 }),
+      ink,
+    );
+    back.position.z = -depth / 2;
+    panel.add(back);
+    // A double gold hairline: a heavy outer rim and a fine inner line.
+    panel.add(ring(-0.32, -0.2, -depth / 2, depth + 0.08, gold));
+    panel.add(ring(-0.06, 0, -depth / 2, depth + 0.05, gold));
+
+    // The gold seam, cut to the arch.
+    const inside = (x, y) =>
+      y <= top ? Math.abs(x) <= w / 2 && y >= -h / 2 : Math.hypot(x, y - top) <= w / 2;
+    let start = 0,
+      end = 0;
+    while (inside(start - 0.01, start - 0.01)) start -= 0.01;
+    while (inside(end + 0.01, end + 0.01)) end += 0.01;
+    const seam = new THREE.Mesh(
+      new THREE.BoxGeometry((end - start) * Math.SQRT2, 0.07, 0.08),
+      gold,
+    );
+    seam.position.set((start + end) / 2, (start + end) / 2, depth / 2 + 0.03);
+    seam.rotation.z = Math.PI / 4;
+    panel.add(seam);
+
+    renderer.render(scene, camera);
+  }
+  whenReady(render());
+</script>

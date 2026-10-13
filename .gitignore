@@ -8,3 +8,5 @@ dist/
 !.env.example
 !.env.schema
 worker-configuration.d.ts
+.dev-certs/
+.claude/scheduled_tasks.lock

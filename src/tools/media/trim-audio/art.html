@@ -1,0 +1,109 @@
+<div class="scene" data-glow="0.5 0.5">
+  <svg viewBox="0 0 1280 800">
+    <defs>
+      <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#a97c34" />
+        <stop offset="0.35" stop-color="#e6c072" />
+        <stop offset="0.5" stop-color="#fff4d6" />
+        <stop offset="0.65" stop-color="#e6c072" />
+        <stop offset="1" stop-color="#a97c34" />
+      </linearGradient>
+      <linearGradient id="edges" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity="0" />
+        <stop offset="0.12" stop-color="#fff" />
+        <stop offset="0.88" stop-color="#fff" />
+        <stop offset="1" stop-color="#fff" stop-opacity="0" />
+      </linearGradient>
+      <mask id="fade"><rect width="1280" height="800" fill="url(#edges)" /></mask>
+    </defs>
+    <g class="outside" mask="url(#fade)"></g>
+    <g class="cartouche"></g>
+    <g class="inside" fill="url(#bar)"></g>
+    <g class="envelope line"></g>
+  </svg>
+</div>
+<style>
+  .scene,
+  .scene svg {
+    width: 1280px;
+    height: 800px;
+  }
+  .outside {
+    fill: var(--gold);
+    opacity: 0.32;
+  }
+  .cartouche .glass {
+    fill: rgb(18 14 34 / 0.62);
+    stroke: var(--gold);
+    stroke-width: 4;
+    filter: drop-shadow(0 40px 50px rgb(10 6 24 / 0.6)) drop-shadow(0 0 30px rgb(230 192 114 / 0.3));
+  }
+  .cartouche .hairline {
+    fill: none;
+    stroke: rgb(230 192 114 / 0.5);
+    stroke-width: 2;
+  }
+  .cartouche .lozenge {
+    fill: var(--gold-light);
+    filter: var(--glow);
+  }
+  .inside {
+    filter: drop-shadow(0 0 6px rgb(230 192 114 / 0.4)) drop-shadow(0 0 2px rgb(248 230 184 / 0.7));
+  }
+  .envelope {
+    stroke: var(--gold-light);
+    stroke-width: 3.5;
+    filter: var(--glow);
+  }
+</style>
+<script type="module">
+  // The real loudness of the sample speech. The middle phrase is kept, with a fade at each end.
+  const peaks = [
+    0.0, 0.0, 0.62, 0.398, 0.54, 0.692, 0.225, 0.49, 0.314, 0.073, 0.587, 0.468, 0.505, 0.52, 0.273,
+    0.295, 0.474, 0.44, 0.14, 0.006, 0.005, 0.003, 0.894, 1.0, 0.788, 0.656, 0.026, 0.452, 0.69,
+    0.738, 0.453, 0.556, 0.375, 0.412, 0.63, 0.278, 0.545, 0.642, 0.424, 0.095, 0.014, 0.002, 0.0,
+    0.0, 0.0, 0.0, 0.002, 0.826, 0.505, 0.733, 0.527, 0.464, 0.38, 0.373, 0.228, 0.173, 0.005,
+    0.008, 0.911, 0.856, 0.767, 0.182, 0.566, 0.291, 0.23, 0.7, 0.356, 0.094, 0.009, 0.0, 0.0, 0.0,
+  ];
+  const first = 22;
+  const last = 39;
+  const pitch = 21;
+  const width = 12;
+  const middle = 400;
+  const height = 205;
+  const x = (i) => 640 + (i - (first + last) / 2) * pitch - width / 2;
+  const left = x(first) - 22;
+  const right = x(last) + width + 22;
+  const ramp = 4.5 * pitch;
+  const gain = (cx) => Math.min(1, (cx - left) / ramp, (right - cx) / ramp);
+
+  const bar = (cx, h) =>
+    `<rect x="${cx - width / 2}" y="${middle - h}" width="${width}" height="${h * 2}" rx="${width / 2}" />`;
+  let outside = "";
+  let inside = "";
+  peaks.forEach((peak, i) => {
+    const cx = x(i) + width / 2;
+    const h = Math.max(5, peak * height);
+    if (i >= first && i <= last) inside += bar(cx, Math.max(5, peak * height * gain(cx)));
+    else outside += bar(cx, h);
+  });
+  document.querySelector(".outside").innerHTML = outside;
+  document.querySelector(".inside").innerHTML = inside;
+
+  const top = middle - height - 52;
+  const bottom = middle + height + 52;
+  const lozenge = (cx, cy, r) =>
+    `<path class="lozenge" d="M${cx} ${cy - r} L${cx + r} ${cy} L${cx} ${cy + r} L${cx - r} ${cy} Z" />`;
+  document.querySelector(".cartouche").innerHTML = `
+    <rect class="glass" x="${left}" y="${top}" width="${right - left}" height="${bottom - top}" rx="30" />
+    <rect class="hairline" x="${left + 10}" y="${top + 10}" width="${right - left - 20}" height="${bottom - top - 20}" rx="22" />
+    ${lozenge(640, top, 15)}${lozenge(640, bottom, 15)}`;
+
+  // The fade envelope, mirrored above and below the kept phrase.
+  const a = height + 14;
+  const curve = (s) =>
+    `M${left} ${middle} C${left + ramp * 0.55} ${middle} ${left + ramp * 0.45} ${middle - s * a} ${left + ramp} ${middle - s * a} ` +
+    `H${right - ramp} C${right - ramp * 0.45} ${middle - s * a} ${right - ramp * 0.55} ${middle} ${right} ${middle}`;
+  document.querySelector(".envelope").innerHTML =
+    `<path d="${curve(1)}" /><path d="${curve(-1)}" />`;
+</script>

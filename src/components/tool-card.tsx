@@ -15,12 +15,20 @@ export function ToolGrid({ tools }: { tools: Tool[] }) {
 }
 
 function ToolCard({ tool }: { tool: Tool }) {
-  const Icon = tool.icon;
   return (
     <Link to={tool.path} className="group block h-full rounded-xl outline-none">
       <Card className="h-full transition-[box-shadow,translate] group-hover:-translate-y-0.5 group-hover:ring-gold/60 group-focus-visible:ring-2 group-focus-visible:ring-ring">
+        {/* The artwork comes from src/tools/<category>/<slug>/art.html via `pnpm thumbs`. */}
+        <img
+          src={`/thumbs/${tool.id}.webp`}
+          alt=""
+          width={640}
+          height={400}
+          loading="lazy"
+          decoding="async"
+          className="aspect-8/5 w-full bg-dusk object-cover"
+        />
         <CardHeader>
-          <Icon className="mb-2 size-5 text-gold" aria-hidden="true" />
           <CardTitle>{tool.name}</CardTitle>
           <CardDescription>{tool.description}</CardDescription>
         </CardHeader>

@@ -15,7 +15,7 @@ export const Route = createFileRoute("/$category/")({
       title: `${category.name} tools | Tools by Tyranny`,
       description: `${category.description} Free, in your browser, nothing uploaded.`,
       path: `/${category.slug}`,
-      image: `/og/${category.slug}.png`,
+      image: `/og/${category.slug}.jpg`,
     });
   },
   component: CategoryPage,
